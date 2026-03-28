@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// For Turso/libsql support, you can switch to:
+// datasource db {
+//   provider = "sqlite"
+//   url      = env("DATABASE_URL")
+// }
+// And use DATABASE_URL="file:./dev.db" for local or libsql URL for production
+
+model Family {
+  id            String   @id @default(uuid())
+  name          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Global notification settings (set by admin)
+  pushoverAppToken  String?
+  pushoverUserKey   String?
+  resendApiKey      String?
+  resendFromEmail   String?
+  
+  isSetupComplete   Boolean  @default(false)
+  
+  members       FamilyMember[]
+  lists         List[]
+  mcpTokens     McpToken[]
+}
+
+model FamilyMember {
+  id            String   @id @default(uuid())
+  familyId      String
+  name          String
+  email         String   @unique
+  password      String   // hashed
+  isAdmin       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // User-specific notification settings (override global if set)
+  pushoverUserKey   String?
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(false)
+  
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  tasksCreated  Task[]   @relation("TaskCreator")
+  tasksAssigned Task[]   @relation("TaskAssignee")
+  listShares    ListShare[]
+  mcpTokens     McpToken[]
+  
+  @@index([familyId])
+}
+
+model List {
+  id            String   @id @default(uuid())
+  familyId      String
+  name          String
+  description   String?
+  color         String   @default("#3b82f6") // default blue
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  isArchived    Boolean  @default(false)
+  
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  tasks         Task[]
+  shares        ListShare[]
+  mcpAccess     McpTokenListAccess[]
+  
+  @@index([familyId])
+}
+
+model ListShare {
+  id            String   @id @default(uuid())
+  listId        String
+  memberId      String
+  canEdit       Boolean  @default(true)
+  canDelete     Boolean  @default(false)
+  canShare      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  
+  list          List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  member        FamilyMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@unique([listId, memberId])
+  @@index([listId])
+  @@index([memberId])
+}
+
+model Task {
+  id            String   @id @default(uuid())
+  listId        String
+  title         String
+  description   String?
+  isCompleted   Boolean  @default(false)
+  isArchived    Boolean  @default(false)
+  dueDate       DateTime?
+  priority      String   @default("medium") // low, medium, high
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdById   String
+  assignedToId  String?
+  parentId      String?  // For subtasks (first level)
+  
+  list          List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdBy     FamilyMember @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignedTo    FamilyMember? @relation("TaskAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  parent        Task?    @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subtasks      Task[]   @relation("Subtasks")
+  
+  @@index([listId])
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([parentId])
+  @@index([isCompleted])
+  @@index([isArchived])
+}
+
+model McpToken {
+  id            String   @id @default(uuid())
+  familyId      String
+  memberId      String
+  name          String   // User-friendly name for this connection
+  token         String   @unique // The random unguessable token
+  allowAllLists Boolean  @default(true)
+  canCreateTasks    Boolean @default(true)
+  canCompleteTasks  Boolean @default(true)
+  canEditTasks      Boolean @default(true)
+  canDeleteTasks    Boolean @default(false)
+  canCreateLists    Boolean @default(false)
+  canEditLists      Boolean @default(false)
+  canDeleteLists    Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastUsedAt    DateTime?
+  
+  family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  member        FamilyMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  listAccess    McpTokenListAccess[]
+  
+  @@index([familyId])
+  @@index([memberId])
+  @@index([token])
+}
+
+model McpTokenListAccess {
+  id          String   @id @default(uuid())
+  mcpTokenId  String
+  listId      String
+  
+  mcpToken    McpToken @relation(fields: [mcpTokenId], references: [id], onDelete: Cascade)
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  
+  @@unique([mcpTokenId, listId])
+  @@index([mcpTokenId])
+  @@index([listId])
+}
