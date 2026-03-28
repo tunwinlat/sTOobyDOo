@@ -1,6 +1,6 @@
 # sTOobyDOo
 
-A modern, MCP-enabled collaborative todo app designed for families and teams. Built with Next.js 14, Prisma, and libsql support for edge deployment on Vercel.
+A modern, MCP-enabled collaborative todo app designed for families and teams. Built with Next.js 16, Prisma, and libsql support for edge deployment on Vercel.
 
 ## ✨ What is sTOobyDOo?
 
@@ -14,8 +14,6 @@ sTOobyDOo is a **family-first task management app** with a twist - it's fully **
 - 🔔 **Smart Notifications**: Pushover push notifications + Resend email notifications
 - 🌓 **Modern UI**: Clean, responsive design with dark mode support
 - 🔒 **Secure**: Token-based MCP authentication with granular permissions
-- ⚡ **Zero-Config Deploy**: Database auto-initializes on first deployment
-- 🛡️ **Data Safe**: Redeploys never delete your existing data
 
 ### MCP Capabilities
 
@@ -120,7 +118,7 @@ Visit `http://localhost:3000` and complete the setup wizard.
 
 | Layer | Technology |
 |-------|------------|
-| **Framework** | Next.js 14 (App Router) |
+| **Framework** | Next.js 16 (App Router) |
 | **Database** | Prisma ORM + libsql (Turso/SQLite) |
 | **Auth** | NextAuth.js (Credentials Provider) |
 | **Styling** | Tailwind CSS 4 + CSS Variables |
@@ -132,7 +130,7 @@ Visit `http://localhost:3000` and complete the setup wizard.
 
 ```
 sTOobyDOo/
-├── app/                    # Next.js 14 App Router
+├── app/                    # Next.js 16 App Router
 │   ├── api/               # API routes (REST + MCP)
 │   ├── dashboard/         # Main dashboard page
 │   ├── lists/             # List management
