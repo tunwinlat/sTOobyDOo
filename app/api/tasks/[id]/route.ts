@@ -7,8 +7,10 @@ import { notifyTaskCompleted } from '@/lib/notifications';
 
 const taskUpdateSchema = z.object({
   title: z.string().min(1).optional(),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   dueDate: z.string().datetime().optional().nullable(),
+  dueTime: z.string().optional().nullable(),
+  reminderAt: z.string().datetime().optional().nullable(),
   priority: z.enum(['low', 'medium', 'high']).optional(),
   isCompleted: z.boolean().optional(),
   isArchived: z.boolean().optional(),
@@ -124,9 +126,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const task = await prisma.task.update({
       where: { id },
       data: {
-        ...validatedData,
+        title: validatedData.title,
+        description: validatedData.description,
+        priority: validatedData.priority,
+        isCompleted: validatedData.isCompleted,
+        isArchived: validatedData.isArchived,
+        assignedToId: validatedData.assignedToId,
         dueDate: validatedData.dueDate !== undefined 
           ? (validatedData.dueDate ? new Date(validatedData.dueDate) : null)
+          : undefined,
+        dueTime: validatedData.dueTime,
+        reminderAt: validatedData.reminderAt !== undefined
+          ? (validatedData.reminderAt ? new Date(validatedData.reminderAt) : null)
           : undefined,
       },
       include: {

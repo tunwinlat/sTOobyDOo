@@ -133,6 +133,8 @@ async function ensureDatabase() {
         isCompleted BOOLEAN DEFAULT 0,
         isArchived BOOLEAN DEFAULT 0,
         dueDate DATETIME,
+        dueTime TEXT,
+        reminderAt DATETIME,
         priority TEXT DEFAULT 'medium',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -144,6 +146,10 @@ async function ensureDatabase() {
         FOREIGN KEY (assignedToId) REFERENCES FamilyMember(id) ON DELETE SET NULL,
         FOREIGN KEY (parentId) REFERENCES Task(id) ON DELETE CASCADE
       );
+      
+      -- Add new columns if they don't exist (for existing databases)
+      ALTER TABLE Task ADD COLUMN dueTime TEXT;
+      ALTER TABLE Task ADD COLUMN reminderAt DATETIME;
       
       CREATE TABLE IF NOT EXISTS McpToken (
         id TEXT PRIMARY KEY,

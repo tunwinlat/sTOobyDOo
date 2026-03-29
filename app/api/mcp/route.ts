@@ -96,7 +96,7 @@ const MCP_TOOLS = [
   },
   {
     name: 'create_task',
-    description: 'Create a new task in a list',
+    description: 'Create a new task in a list with optional due date and reminder',
     inputSchema: {
       type: 'object',
       properties: {
@@ -120,7 +120,15 @@ const MCP_TOOLS = [
         },
         dueDate: {
           type: 'string',
-          description: 'Optional due date in ISO 8601 format',
+          description: 'Optional due date in ISO 8601 format (e.g., 2024-12-25)',
+        },
+        dueTime: {
+          type: 'string',
+          description: 'Optional due time in 24-hour format (e.g., 14:30)',
+        },
+        reminderAt: {
+          type: 'string',
+          description: 'Optional reminder datetime in ISO 8601 format',
         },
         parentId: {
           type: 'string',
@@ -160,7 +168,7 @@ const MCP_TOOLS = [
   },
   {
     name: 'update_task',
-    description: 'Update task details',
+    description: 'Update task details including due date and reminder',
     inputSchema: {
       type: 'object',
       properties: {
@@ -184,6 +192,14 @@ const MCP_TOOLS = [
         dueDate: {
           type: 'string',
           description: 'New due date in ISO 8601 format (or null to remove)',
+        },
+        dueTime: {
+          type: 'string',
+          description: 'New due time in 24-hour format (or null to remove)',
+        },
+        reminderAt: {
+          type: 'string',
+          description: 'New reminder datetime in ISO 8601 format (or null to remove)',
         },
       },
       required: ['taskId'],
@@ -524,6 +540,8 @@ async function executeTool(
           description: params?.description || null,
           priority: params?.priority || 'medium',
           dueDate: params?.dueDate ? new Date(params.dueDate) : null,
+          dueTime: params?.dueTime || null,
+          reminderAt: params?.reminderAt ? new Date(params.reminderAt) : null,
           createdById: member.id,
           parentId: params?.parentId || null,
         },
@@ -535,7 +553,7 @@ async function executeTool(
       return { 
         success: true, 
         task,
-        message: `Task "${task.title}" created in list "${task.list.name}"`,
+        message: `Task "${task.title}" created in list "${task.list.name}"${task.dueDate ? ` (due: ${task.dueDate.toISOString()})` : ''}`,
       };
     }
 
@@ -634,6 +652,10 @@ async function executeTool(
       if (params.dueDate !== undefined) {
         updateData.dueDate = params.dueDate ? new Date(params.dueDate) : null;
       }
+      if (params.dueTime !== undefined) updateData.dueTime = params.dueTime;
+      if (params.reminderAt !== undefined) {
+        updateData.reminderAt = params.reminderAt ? new Date(params.reminderAt) : null;
+      }
 
       const task = await prisma.task.update({
         where: { id: params.taskId },
@@ -643,7 +665,7 @@ async function executeTool(
       return { 
         success: true, 
         task,
-        message: `Task "${task.title}" updated successfully`,
+        message: `Task "${task.title}" updated successfully${task.dueDate ? ` (due: ${task.dueDate.toISOString()})` : ''}`,
       };
     }
 

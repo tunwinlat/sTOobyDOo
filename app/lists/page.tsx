@@ -222,6 +222,8 @@ export default function ListsPage() {
                   
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span>{total} open task{total !== 1 ? 's' : ''}</span>
+                    <span>•</span>
+                    <span>Created {new Date(list.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   </div>
 
                   {total > 0 && (

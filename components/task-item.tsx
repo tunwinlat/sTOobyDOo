@@ -4,7 +4,33 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Task } from '@/types';
 import { formatDate } from '@/lib/utils';
-import { Check, ChevronDown, ListTodo, Calendar, Flag, Trash2, MoreHorizontal, Edit3, Plus, X, ChevronRight } from 'lucide-react';
+import { Check, ChevronDown, ListTodo, Calendar, Flag, Trash2, MoreHorizontal, Edit3, Plus, X, ChevronRight, Clock, Bell } from 'lucide-react';
+
+// Helper to format date and time
+function formatDateTime(dateStr: string | null, timeStr: string | null): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const dateFormatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (timeStr) {
+    return `${dateFormatted} at ${timeStr}`;
+  }
+  return dateFormatted;
+}
+
+function formatRelativeTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 interface TaskItemProps {
   task: Task;
@@ -217,9 +243,15 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
                   </Link>
                 )}
                 {task.dueDate && (
-                  <span className="inline-flex items-center gap-1">
+                  <span className={`inline-flex items-center gap-1 ${new Date(task.dueDate) < new Date() && !task.isCompleted ? 'text-red-400' : ''}`}>
                     <Calendar className="h-3 w-3" />
-                    {formatDate(task.dueDate)}
+                    {formatDateTime(task.dueDate, task.dueTime)}
+                  </span>
+                )}
+                {task.reminderAt && (
+                  <span className="inline-flex items-center gap-1 text-amber-400">
+                    <Bell className="h-3 w-3" />
+                    {formatDateTime(task.reminderAt, null)}
                   </span>
                 )}
                 {task.priority && (
@@ -233,6 +265,10 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
                     {task.subtasks?.length || 0} subtask{task.subtasks?.length !== 1 ? 's' : ''}
                   </span>
                 )}
+                <span className="inline-flex items-center gap-1 opacity-60" title={`Created ${formatRelativeTime(task.createdAt)}`}>
+                  <Clock className="h-3 w-3" />
+                  {formatRelativeTime(task.createdAt)}
+                </span>
               </div>
 
               {/* Description preview */}
@@ -343,6 +379,9 @@ function TaskEditModal({ task, onClose, onUpdate }: TaskEditModalProps) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || '');
   const [priority, setPriority] = useState(task.priority);
+  const [dueDate, setDueDate] = useState(task.dueDate ? task.dueDate.split('T')[0] : '');
+  const [dueTime, setDueTime] = useState(task.dueTime || '');
+  const [reminderAt, setReminderAt] = useState(task.reminderAt ? task.reminderAt.slice(0, 16) : '');
   const [subtasks, setSubtasks] = useState(task.subtasks || []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -350,6 +389,14 @@ function TaskEditModal({ task, onClose, onUpdate }: TaskEditModalProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Build due date with time if provided
+      let finalDueDate = null;
+      if (dueDate) {
+        finalDueDate = dueTime 
+          ? new Date(`${dueDate}T${dueTime}`).toISOString()
+          : new Date(dueDate).toISOString();
+      }
+
       const res = await fetch(`/api/tasks/${task.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -357,11 +404,21 @@ function TaskEditModal({ task, onClose, onUpdate }: TaskEditModalProps) {
           title,
           description: description || null,
           priority,
+          dueDate: finalDueDate,
+          dueTime: dueTime || null,
+          reminderAt: reminderAt ? new Date(reminderAt).toISOString() : null,
         }),
       });
 
       if (res.ok) {
-        onUpdate({ title, description: description || null, priority });
+        onUpdate({ 
+          title, 
+          description: description || null, 
+          priority,
+          dueDate: finalDueDate,
+          dueTime: dueTime || null,
+          reminderAt: reminderAt ? new Date(reminderAt).toISOString() : null,
+        });
       }
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -435,6 +492,39 @@ function TaskEditModal({ task, onClose, onUpdate }: TaskEditModalProps) {
               placeholder="Add a description..."
               rows={3}
               className="w-full px-3 py-2 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm resize-none focus:outline-none focus:border-white/[0.15]"
+            />
+          </div>
+
+          {/* Due Date & Time */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Due Date</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Due Time</label>
+              <input
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15]"
+              />
+            </div>
+          </div>
+
+          {/* Reminder */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">Reminder</label>
+            <input
+              type="datetime-local"
+              value={reminderAt}
+              onChange={(e) => setReminderAt(e.target.value)}
+              className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15]"
             />
           </div>
 

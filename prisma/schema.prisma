@@ -92,7 +92,10 @@ model Task {
   description   String?
   isCompleted   Boolean  @default(false)
   isArchived    Boolean  @default(false)
-  dueDate       DateTime?
+  dueDate       DateTime? // When the task is due
+  dueTime       String?   // Time portion (HH:MM format) for display
+  reminderAt    DateTime? // When to send reminder notification
+  reminderSent  Boolean  @default(false) // Whether reminder has been sent
   priority      String   @default("medium") // low, medium, high
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -112,6 +115,8 @@ model Task {
   @@index([parentId])
   @@index([isCompleted])
   @@index([isArchived])
+  @@index([dueDate])
+  @@index([reminderAt])
 }
 
 model McpToken {

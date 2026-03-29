@@ -32,6 +32,9 @@ export default function ListDetailPage() {
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [newTaskDueDate, setNewTaskDueDate] = useState('');
+  const [newTaskDueTime, setNewTaskDueTime] = useState('');
+  const [newTaskReminder, setNewTaskReminder] = useState('');
   const [activeTab, setActiveTab] = useState<'open' | 'completed'>('open');
 
   useEffect(() => {
@@ -79,6 +82,20 @@ export default function ListDetailPage() {
 
     setIsCreatingTask(true);
     try {
+      // Build due date with time if provided
+      let dueDate = null;
+      if (newTaskDueDate) {
+        dueDate = newTaskDueTime 
+          ? new Date(`${newTaskDueDate}T${newTaskDueTime}`).toISOString()
+          : new Date(newTaskDueDate).toISOString();
+      }
+
+      // Build reminder date if provided
+      let reminderAt = null;
+      if (newTaskReminder) {
+        reminderAt = new Date(newTaskReminder).toISOString();
+      }
+
       const res = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -86,6 +103,9 @@ export default function ListDetailPage() {
           listId,
           title: newTaskTitle,
           priority: newTaskPriority,
+          dueDate,
+          dueTime: newTaskDueTime || null,
+          reminderAt,
         }),
       });
 
@@ -94,6 +114,9 @@ export default function ListDetailPage() {
         setTasks((prev) => [newTask, ...prev]);
         setNewTaskTitle('');
         setNewTaskPriority('medium');
+        setNewTaskDueDate('');
+        setNewTaskDueTime('');
+        setNewTaskReminder('');
         setIsCreating(false);
       }
     } catch (error) {
@@ -101,7 +124,7 @@ export default function ListDetailPage() {
     } finally {
       setIsCreatingTask(false);
     }
-  }, [newTaskTitle, newTaskPriority, listId, isCreatingTask]);
+  }, [newTaskTitle, newTaskPriority, newTaskDueDate, newTaskDueTime, newTaskReminder, listId, isCreatingTask]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -249,7 +272,44 @@ export default function ListDetailPage() {
                 disabled={isCreatingTask}
                 className="h-12 bg-white/[0.03] border-white/[0.08] rounded-xl text-base disabled:opacity-50"
               />
-              <div className="flex items-center gap-2">
+              {/* Due Date & Time */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Due Date</label>
+                  <input
+                    type="date"
+                    value={newTaskDueDate}
+                    onChange={(e) => setNewTaskDueDate(e.target.value)}
+                    disabled={isCreatingTask}
+                    className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15] disabled:opacity-50"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Due Time</label>
+                  <input
+                    type="time"
+                    value={newTaskDueTime}
+                    onChange={(e) => setNewTaskDueTime(e.target.value)}
+                    disabled={isCreatingTask}
+                    className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15] disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              {/* Reminder */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground">Reminder (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={newTaskReminder}
+                  onChange={(e) => setNewTaskReminder(e.target.value)}
+                  disabled={isCreatingTask}
+                  className="w-full h-10 px-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-sm focus:outline-none focus:border-white/[0.15] disabled:opacity-50"
+                />
+              </div>
+
+              {/* Priority */}
+              <div className="flex items-center gap-2 pt-2">
                 <span className="text-sm text-muted-foreground">Priority:</span>
                 <div className="flex gap-2">
                   {(['low', 'medium', 'high'] as const).map((priority) => (
@@ -272,6 +332,9 @@ export default function ListDetailPage() {
                   onClick={() => {
                     setIsCreating(false);
                     setNewTaskTitle('');
+                    setNewTaskDueDate('');
+                    setNewTaskDueTime('');
+                    setNewTaskReminder('');
                   }}
                   disabled={isCreatingTask}
                   className="px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all disabled:opacity-50"

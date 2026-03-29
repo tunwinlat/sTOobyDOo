@@ -11,7 +11,7 @@ sTOobyDOo is a **family-first task management app** with a twist - it's fully **
 - 👨‍👩‍👧‍👦 **Multi-User Families**: Create a family instance with multiple members, each having their own private lists
 - 🤖 **AI-Ready (MCP)**: Control your tasks via natural language using any MCP-compatible AI assistant
 - 📝 **Nested Tasks**: Support for two levels of subtasks for complex projects
-- 🔔 **Smart Notifications**: Pushover push notifications + Resend email notifications
+- 🔔 **Smart Notifications**: Pushover push notifications + Resend email notifications with due date reminders
 - 🌓 **Modern UI**: Clean, responsive design with dark mode support
 - 🔒 **Secure**: Token-based MCP authentication with granular permissions
 
@@ -24,6 +24,8 @@ Connect your favorite AI assistant and manage tasks using natural language:
 - "Mark the grocery shopping task as complete"
 - "Create a new list called 'Vacation Planning'"
 - "What tasks are due this week?"
+- "Set a reminder for the doctor appointment at 2 PM tomorrow"
+- "Update the project deadline to next Friday"
 
 ## 🚀 Quick Start
 
@@ -232,7 +234,7 @@ Add to Cursor MCP settings:
 | `create_task` | `canCreateTasks` | Create a task with optional parent (supports 2-level nesting) |
 | `complete_task` | `canCompleteTasks` | Mark a task as completed |
 | `uncomplete_task` | `canEditTasks` | Mark a completed task as incomplete |
-| `update_task` | `canEditTasks` | Update title, description, priority, or due date |
+| `update_task` | `canEditTasks` | Update title, description, priority, due date, due time, or reminder |
 | `delete_task` | `canDeleteTasks` | Permanently delete a task |
 | `archive_task` | `canEditTasks` | Archive a completed task (soft delete) |
 | `unarchive_task` | `canEditTasks` | Restore an archived task to active |
@@ -241,9 +243,11 @@ Add to Cursor MCP settings:
 
 - **Nested Subtasks**: Create up to 2 levels of subtasks (task → subtask → sub-subtask)
 - **Descriptions**: Add detailed descriptions to any task
-- **Due Dates**: Set due dates in ISO 8601 format
+- **Due Dates & Times**: Set due dates in ISO 8601 format with optional time
+- **Reminders**: Schedule reminder notifications before due dates
 - **Priority Levels**: low, medium, high
 - **List Access Control**: Restrict tokens to specific lists
+- **Smart Reminders**: Automatic notifications via Pushover/Resend when reminders trigger
 
 #### Working with Subtasks via MCP
 
@@ -307,6 +311,7 @@ When creating a new MCP token, these are the default permissions:
 | `PUSHOVER_USER_KEY` | Default Pushover user key |
 | `RESEND_API_KEY` | Resend API key |
 | `RESEND_FROM_EMAIL` | From email address |
+| `CRON_SECRET` | Secret for cron job authorization (reminders) |
 
 ---
 

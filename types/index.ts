@@ -50,6 +50,9 @@ export interface Task {
   isCompleted: boolean;
   isArchived: boolean;
   dueDate: string | null;
+  dueTime: string | null;
+  reminderAt: string | null;
+  reminderSent?: boolean;
   priority: 'low' | 'medium' | 'high';
   createdAt: string;
   updatedAt: string;
