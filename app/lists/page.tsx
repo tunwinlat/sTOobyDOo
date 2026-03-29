@@ -93,10 +93,9 @@ export default function ListsPage() {
   };
 
   const getTaskCount = (list: List) => {
-    const tasks = list.tasks || [];
-    const total = tasks.length;
-    const completed = tasks.filter((t: Task) => t.isCompleted).length;
-    return { total, completed };
+    // Use _count from API if available, otherwise fall back to tasks array
+    const total = (list as any)._count?.tasks ?? list.tasks?.length ?? 0;
+    return { total, completed: 0 }; // API only returns open task count
   };
 
   if (status === 'loading' || isLoading) {
@@ -192,8 +191,7 @@ export default function ListsPage() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {lists.map((list) => {
-              const { total, completed } = getTaskCount(list);
-              const progress = total > 0 ? (completed / total) * 100 : 0;
+              const { total } = getTaskCount(list);
               
               return (
                 <Link
@@ -223,10 +221,7 @@ export default function ListsPage() {
                   )}
                   
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{total} task{total !== 1 ? 's' : ''}</span>
-                    {total > 0 && completed > 0 && (
-                      <span className="text-emerald-500/80">{completed} done</span>
-                    )}
+                    <span>{total} open task{total !== 1 ? 's' : ''}</span>
                   </div>
 
                   {total > 0 && (
@@ -234,7 +229,7 @@ export default function ListsPage() {
                       <div className="h-1 w-full rounded-full bg-white/[0.06] overflow-hidden">
                         <div 
                           className="h-full rounded-full bg-foreground/50 transition-all duration-500"
-                          style={{ width: `${progress}%` }}
+                          style={{ width: '100%' }}
                         />
                       </div>
                     </div>
