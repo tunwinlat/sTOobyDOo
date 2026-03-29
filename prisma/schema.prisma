@@ -7,13 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// For Turso/libsql support, you can switch to:
-// datasource db {
-//   provider = "sqlite"
-//   url      = env("DATABASE_URL")
-// }
-// And use DATABASE_URL="file:./dev.db" for local or libsql URL for production
-
 model Family {
   id            String   @id @default(uuid())
   name          String
