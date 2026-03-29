@@ -203,22 +203,62 @@ Add to Cursor MCP settings:
 }
 ```
 
-### Available MCP Tools
+### Available MCP Tools (18 Total)
 
-| Tool | Description |
-|------|-------------|
-| `get_lists` | Get all accessible lists |
-| `get_list_tasks` | Get tasks in a specific list |
-| `get_task` | Get details of a task |
-| `search_tasks` | Search tasks by title/description |
-| `create_task` | Create a new task |
-| `complete_task` | Mark a task complete |
-| `uncomplete_task` | Mark a task incomplete |
-| `update_task` | Update task details |
-| `delete_task` | Delete a task |
-| `archive_task` | Archive a completed task |
-| `create_list` | Create a new list |
-| `get_all_open_tasks` | Get all open tasks |
+#### List Management
+
+| Tool | Permission Required | Description |
+|------|---------------------|-------------|
+| `get_lists` | None | Get all accessible lists with open task counts |
+| `get_list` | None | Get a single list by ID |
+| `get_list_tasks` | None | Get all tasks in a list (includes 2 levels of subtasks) |
+| `create_list` | `canCreateLists` | Create a new list with name, description, and color |
+| `update_list` | `canEditLists` | Update list name, description, or color |
+| `delete_list` | `canDeleteLists` | Permanently delete a list and all its tasks |
+
+#### Task Queries
+
+| Tool | Permission Required | Description |
+|------|---------------------|-------------|
+| `get_task` | None | Get full details of a task including subtasks |
+| `get_all_open_tasks` | None | Get all incomplete tasks across lists |
+| `get_archived_tasks` | None | Get archived tasks (optionally filter by list) |
+| `search_tasks` | None | Search tasks by title or description |
+
+#### Task Management
+
+| Tool | Permission Required | Description |
+|------|---------------------|-------------|
+| `create_task` | `canCreateTasks` | Create a task with optional parent (supports 2-level nesting) |
+| `complete_task` | `canCompleteTasks` | Mark a task as completed |
+| `uncomplete_task` | `canEditTasks` | Mark a completed task as incomplete |
+| `update_task` | `canEditTasks` | Update title, description, priority, or due date |
+| `delete_task` | `canDeleteTasks` | Permanently delete a task |
+| `archive_task` | `canEditTasks` | Archive a completed task (soft delete) |
+| `unarchive_task` | `canEditTasks` | Restore an archived task to active |
+
+#### Task Features
+
+- **Nested Subtasks**: Create up to 2 levels of subtasks (task → subtask → sub-subtask)
+- **Descriptions**: Add detailed descriptions to any task
+- **Due Dates**: Set due dates in ISO 8601 format
+- **Priority Levels**: low, medium, high
+- **List Access Control**: Restrict tokens to specific lists
+
+### Default MCP Token Permissions
+
+When creating a new MCP token, these are the default permissions:
+
+| Permission | Default | Description |
+|------------|---------|-------------|
+| `canCreateTasks` | ✅ true | Create new tasks |
+| `canCompleteTasks` | ✅ true | Mark tasks as complete |
+| `canEditTasks` | ✅ true | Edit task details |
+| `canDeleteTasks` | ❌ false | Permanently delete tasks |
+| `canCreateLists` | ❌ false | Create new lists |
+| `canEditLists` | ❌ false | Edit list details |
+| `canDeleteLists` | ❌ false | Delete lists |
+| `allowAllLists` | ✅ true | Access to all lists (or select specific ones) |
 
 ---
 
