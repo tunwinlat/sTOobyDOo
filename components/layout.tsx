@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   ListTodo,
@@ -21,13 +20,13 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Lists', href: '/lists', icon: ListTodo },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'bg-blue-500' },
+  { name: 'Lists', href: '/lists', icon: ListTodo, color: 'bg-purple-500' },
 ];
 
 const bottomNavigation = [
-  { name: 'MCP Tokens', href: '/settings/mcp', icon: Cpu },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'MCP Tokens', href: '/settings/mcp', icon: Cpu, color: 'bg-pink-500' },
+  { name: 'Settings', href: '/settings', icon: Settings, color: 'bg-emerald-500' },
 ];
 
 interface LayoutProps {
@@ -44,50 +43,60 @@ export function Layout({ children }: LayoutProps) {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-bg">
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Check className="h-5 w-5 text-primary-foreground" />
+      <div className="lg:hidden flex items-center justify-between p-4 glass-card m-4 rounded-2xl">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+            S
           </div>
           <span className="font-bold text-xl">sTOobyDOo</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-xl hover:bg-white/10 transition-colors"
         >
-          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+          {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-72 p-4 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="h-full flex flex-col">
+          <div className="h-full flex flex-col glass-card rounded-3xl p-6">
             {/* Logo */}
-            <div className="hidden lg:flex items-center gap-2 p-6 border-b">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <Check className="h-5 w-5 text-primary-foreground" />
+            <div className="hidden lg:flex items-center gap-3 mb-8">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/25">
+                S
               </div>
-              <span className="font-bold text-xl">sTOobyDOo</span>
+              <span className="font-bold text-2xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                sTOobyDOo
+              </span>
             </div>
 
             {/* User info */}
-            <div className="p-4 border-b">
+            <div className="mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-primary" />
+                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                  {getInitials(session?.user?.name || 'U')}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{session?.user?.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="font-semibold truncate">{session?.user?.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {session?.user?.isAdmin ? 'Admin' : 'Member'}
                   </p>
                 </div>
@@ -95,7 +104,7 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            <nav className="flex-1 space-y-2">
               {navigation.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
                 const Icon = item.icon;
@@ -104,13 +113,15 @@ export function Layout({ children }: LayoutProps) {
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
+                    <div className={`h-8 w-8 rounded-lg ${item.color} flex items-center justify-center text-white`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
                     {item.name}
                   </Link>
                 );
@@ -118,7 +129,7 @@ export function Layout({ children }: LayoutProps) {
             </nav>
 
             {/* Bottom navigation */}
-            <div className="p-4 border-t space-y-1">
+            <div className="space-y-2 pt-4 border-t border-border/50">
               {bottomNavigation.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
                 const Icon = item.icon;
@@ -127,13 +138,15 @@ export function Layout({ children }: LayoutProps) {
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
+                    <div className={`h-8 w-8 rounded-lg ${item.color} flex items-center justify-center text-white`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
                     {item.name}
                   </Link>
                 );
@@ -141,26 +154,21 @@ export function Layout({ children }: LayoutProps) {
 
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
               >
-                {theme === 'dark' ? (
-                  <>
-                    <Sun className="h-5 w-5" />
-                    Light mode
-                  </>
-                ) : (
-                  <>
-                    <Moon className="h-5 w-5" />
-                    Dark mode
-                  </>
-                )}
+                <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center text-white">
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </div>
+                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
               </button>
 
               <button
                 onClick={() => signOut({ callbackUrl: '/login' })}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200"
               >
-                <LogOut className="h-5 w-5" />
+                <div className="h-8 w-8 rounded-lg bg-red-500 flex items-center justify-center text-white">
+                  <LogOut className="h-4 w-4" />
+                </div>
                 Sign out
               </button>
             </div>
@@ -170,14 +178,14 @@ export function Layout({ children }: LayoutProps) {
         {/* Overlay for mobile */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-w-0">
-          <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+        <main className="flex-1 min-w-0 p-4 lg:p-8">
+          <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>

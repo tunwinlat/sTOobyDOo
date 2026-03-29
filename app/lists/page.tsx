@@ -5,20 +5,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { List as ListType } from '@/types';
 import { Layout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-  Plus,
-  ListTodo,
-  Loader2,
-  MoreVertical,
-  Trash2,
-  Edit3,
-  Check,
-  X,
-} from 'lucide-react';
+import { Plus, ListTodo, Loader2, Trash2, Edit3, Check, X, FolderOpen } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ListsPage() {
@@ -117,146 +105,177 @@ export default function ListsPage() {
     }
   };
 
+  const getListColor = (color: string) => {
+    const colorMap: Record<string, string> = {
+      '#3b82f6': 'from-blue-500 to-cyan-500',
+      '#ef4444': 'from-red-500 to-pink-500',
+      '#22c55e': 'from-emerald-500 to-teal-500',
+      '#f59e0b': 'from-amber-500 to-orange-500',
+      '#8b5cf6': 'from-purple-500 to-violet-500',
+    };
+    return colorMap[color] || 'from-purple-500 to-pink-500';
+  };
+
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="glass-card rounded-3xl p-8">
+          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" />
+        </div>
       </div>
     );
   }
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Lists</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              Lists
+            </h1>
+            <p className="text-muted-foreground mt-1">
               Manage your todo lists
             </p>
           </div>
-          <Button onClick={() => setIsCreating(true)} disabled={isCreating}>
-            <Plus className="h-4 w-4 mr-2" />
+          <button
+            onClick={() => setIsCreating(true)}
+            disabled={isCreating}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200 hover:scale-105 disabled:opacity-50"
+          >
+            <Plus className="h-5 w-5" />
             New List
-          </Button>
+          </button>
         </div>
 
         {/* Create new list form */}
         {isCreating && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter list name..."
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
-                  autoFocus
-                />
-                <Button onClick={handleCreateList}>
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" onClick={() => setIsCreating(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="glass-card rounded-3xl p-6">
+            <div className="flex gap-3">
+              <Input
+                placeholder="Enter list name..."
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateList()}
+                className="flex-1 bg-white/5 border-white/10 rounded-xl"
+                autoFocus
+              />
+              <button
+                onClick={handleCreateList}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium"
+              >
+                <Check className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setIsCreating(false)}
+                className="px-4 py-2 rounded-xl bg-white/5 text-muted-foreground hover:bg-white/10"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Lists grid */}
         {lists.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <ListTodo className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <p className="text-lg font-medium text-muted-foreground">No lists yet</p>
-              <p className="text-sm text-muted-foreground">Create your first list to get started.</p>
-              <Button className="mt-4" onClick={() => setIsCreating(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create a list
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="glass-card rounded-3xl p-12 text-center">
+            <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-6">
+              <FolderOpen className="h-10 w-10 text-purple-400" />
+            </div>
+            <h3 className="text-2xl font-semibold mb-2">No lists yet</h3>
+            <p className="text-muted-foreground mb-6">Create your first list to get started.</p>
+            <button
+              onClick={() => setIsCreating(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200"
+            >
+              <Plus className="h-5 w-5" />
+              Create a list
+            </button>
+          </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {lists.map((list) => (
-              <Card key={list.id} className="group hover:border-primary/20 transition-colors">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="h-10 w-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: `${list.color}20` }}
-                      >
-                        <ListTodo className="h-5 w-5" style={{ color: list.color }} />
-                      </div>
-                      <div>
-                        {editingList === list.id ? (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              value={editName}
-                              onChange={(e) => setEditName(e.target.value)}
-                              className="h-8 w-40"
-                              autoFocus
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleEditList(list.id);
-                                if (e.key === 'Escape') setEditingList(null);
-                              }}
-                            />
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                              onClick={() => handleEditList(list.id)}
-                            >
-                              <Check className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <Link
-                            href={`/lists/${list.id}`}
-                            className="font-semibold hover:underline"
-                          >
-                            {list.name}
-                          </Link>
-                        )}
-                        <p className="text-xs text-muted-foreground">
-                          {list._count?.tasks || 0} open tasks
-                        </p>
-                      </div>
+              <div
+                key={list.id}
+                className="glass-card rounded-3xl p-6 group hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${getListColor(list.color)} flex items-center justify-center text-white shadow-lg`}
+                    >
+                      <ListTodo className="h-7 w-7" />
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8"
-                        onClick={() => {
-                          setEditingList(list.id);
-                          setEditName(list.name);
-                        }}
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 text-destructive"
-                        onClick={() => handleDeleteList(list.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div>
+                      {editingList === list.id ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="h-10 w-40 bg-white/5 border-white/10 rounded-xl"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleEditList(list.id);
+                              if (e.key === 'Escape') setEditingList(null);
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <Link
+                          href={`/lists/${list.id}`}
+                          className="font-bold text-xl hover:text-purple-400 transition-colors"
+                        >
+                          {list.name}
+                        </Link>
+                      )}
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {list._count?.tasks || 0} open tasks
+                      </p>
                     </div>
                   </div>
-                </CardHeader>
-                {list.description && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {list.description}
-                    </p>
-                  </CardContent>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => {
+                        setEditingList(list.id);
+                        setEditName(list.name);
+                      }}
+                      className="p-2 rounded-xl bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-foreground transition-colors"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteList(list.id)}
+                      className="p-2 rounded-xl bg-white/5 text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {editingList === list.id && (
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => handleEditList(list.id)}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingList(null)}
+                      className="px-4 py-2 rounded-xl bg-white/5 text-muted-foreground text-sm font-medium hover:bg-white/10"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 )}
-              </Card>
+
+                {list.description && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-4">
+                    {list.description}
+                  </p>
+                )}
+              </div>
             ))}
           </div>
         )}

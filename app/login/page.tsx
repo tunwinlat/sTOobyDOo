@@ -3,9 +3,7 @@
 import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
 
 function LoginForm() {
@@ -46,91 +44,91 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <div className="flex items-center gap-2 mb-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Check className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-xl">sTOobyDOo</span>
+    <div className="w-full max-w-md">
+      {/* Logo */}
+      <div className="text-center mb-8">
+        <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center text-white font-bold text-3xl shadow-2xl shadow-purple-500/30 mx-auto mb-6">
+          S
         </div>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your family account</CardDescription>
-        
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+          sTOobyDOo
+        </h1>
+        <p className="text-muted-foreground mt-2">Welcome back</p>
+      </div>
+
+      <div className="glass-card rounded-3xl p-8">
         {setupSuccess && (
-          <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-2 text-green-600 dark:text-green-400">
-            <Check className="h-4 w-4" />
-            <span className="text-sm">Setup completed successfully! Please sign in.</span>
+          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 text-emerald-400">
+            <Check className="h-5 w-5" />
+            <span className="text-sm">Setup completed! Please sign in.</span>
           </div>
         )}
-      </CardHeader>
 
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-4 w-4" />
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400">
+              <AlertCircle className="h-5 w-5" />
               <span className="text-sm">{error}</span>
             </div>
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-medium text-muted-foreground">Email</label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className="pl-10"
+                className="pl-12 h-14 bg-white/5 border-white/10 rounded-xl text-lg"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Password</label>
+            <label className="text-sm font-medium text-muted-foreground">Password</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                className="pl-10"
+                className="pl-12 h-14 bg-white/5 border-white/10 rounded-xl text-lg"
                 required
               />
             </div>
           </div>
-        </CardContent>
 
-        <CardFooter>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
                 Signing in...
               </>
             ) : (
               'Sign In'
             )}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+    <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
       <Suspense fallback={
-        <Card className="w-full max-w-md">
-          <CardContent className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </CardContent>
-        </Card>
+        <div className="glass-card rounded-3xl p-12">
+          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto" />
+        </div>
       }>
         <LoginForm />
       </Suspense>

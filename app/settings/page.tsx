@@ -4,15 +4,10 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Layout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-// Switch component is defined below
 import { Loader2, Save, Bell, Mail, User, Shield, Cpu } from 'lucide-react';
 import Link from 'next/link';
 
-// Simple Switch component since we don't have shadcn installed
 function SimpleSwitch({ 
   checked, 
   onCheckedChange 
@@ -23,12 +18,12 @@ function SimpleSwitch({
   return (
     <button
       onClick={() => onCheckedChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        checked ? 'bg-primary' : 'bg-muted'
+      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+        checked ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-white/10'
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
           checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
@@ -62,7 +57,6 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      // Fetch current user settings
       const res = await fetch('/api/user');
       if (res.ok) {
         const data = await res.json();
@@ -103,70 +97,81 @@ export default function SettingsPage() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="glass-card rounded-3xl p-8">
+          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" />
+        </div>
       </div>
     );
   }
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-2xl">
+      <div className="space-y-8 max-w-2xl">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+            Settings
+          </h1>
+          <p className="text-muted-foreground mt-1">
             Manage your account and preferences
           </p>
         </div>
 
         {/* Profile Settings */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
-              <CardTitle>Profile</CardTitle>
+        <div className="glass-card rounded-3xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <User className="h-6 w-6 text-white" />
             </div>
-            <CardDescription>Your personal information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            <div>
+              <h2 className="text-xl font-bold">Profile</h2>
+              <p className="text-sm text-muted-foreground">Your personal information</p>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Name</label>
+              <label className="text-sm font-medium text-muted-foreground">Name</label>
               <Input
                 value={settings.name}
                 onChange={(e) => setSettings((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Your name"
+                className="bg-white/5 border-white/10 rounded-xl"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium text-muted-foreground">Email</label>
               <Input
                 type="email"
                 value={settings.email}
                 disabled
-                className="bg-muted"
+                className="bg-white/5 border-white/10 rounded-xl opacity-50"
               />
               <p className="text-xs text-muted-foreground">Email cannot be changed</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Notification Settings */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <CardTitle>Notifications</CardTitle>
+        <div className="glass-card rounded-3xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+              <Bell className="h-6 w-6 text-white" />
             </div>
-            <CardDescription>How you want to be notified</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div>
+              <h2 className="text-xl font-bold">Notifications</h2>
+              <p className="text-sm text-muted-foreground">How you want to be notified</p>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <label className="text-sm font-medium">Email Notifications</label>
+                  <label className="font-medium">Email Notifications</label>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Receive email updates about your tasks
                 </p>
               </div>
@@ -178,13 +183,13 @@ export default function SettingsPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4 text-muted-foreground" />
-                  <label className="text-sm font-medium">Push Notifications</label>
+                  <label className="font-medium">Push Notifications</label>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Receive push notifications via Pushover
                 </p>
               </div>
@@ -197,73 +202,85 @@ export default function SettingsPage() {
             </div>
 
             {settings.pushNotifications && (
-              <div className="space-y-2 pt-4 border-t">
-                <label className="text-sm font-medium">Pushover User Key</label>
+              <div className="space-y-2 pt-4 border-t border-white/10">
+                <label className="text-sm font-medium text-muted-foreground">Pushover User Key</label>
                 <Input
                   value={settings.pushoverUserKey}
                   onChange={(e) =>
                     setSettings((prev) => ({ ...prev, pushoverUserKey: e.target.value }))
                   }
                   placeholder="Your Pushover user key"
+                  className="bg-white/5 border-white/10 rounded-xl"
                 />
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* MCP Tokens */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Cpu className="h-5 w-5 text-primary" />
-              <CardTitle>MCP Integration</CardTitle>
+        <div className="glass-card rounded-3xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+              <Cpu className="h-6 w-6 text-white" />
             </div>
-            <CardDescription>Manage LLM access to your tasks</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Create MCP tokens to allow LLMs (like Claude, GPT, etc.) to access and manage your tasks.
-              You can create multiple tokens with different permissions.
-            </p>
-            <Link href="/settings/mcp" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-              Manage MCP Tokens
-            </Link>
-          </CardContent>
-        </Card>
+            <div>
+              <h2 className="text-xl font-bold">MCP Integration</h2>
+              <p className="text-sm text-muted-foreground">Manage LLM access to your tasks</p>
+            </div>
+          </div>
+          
+          <p className="text-sm text-muted-foreground mb-6">
+            Create MCP tokens to allow LLMs (like Claude, GPT, etc.) to access and manage your tasks.
+            You can create multiple tokens with different permissions.
+          </p>
+          <Link
+            href="/settings/mcp"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-all duration-200"
+          >
+            Manage MCP Tokens
+          </Link>
+        </div>
 
         {/* Admin Settings Link (only for admins) */}
         {session?.user?.isAdmin && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <CardTitle>Administration</CardTitle>
+          <div className="glass-card rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <Shield className="h-6 w-6 text-white" />
               </div>
-              <CardDescription>Family-wide settings</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/settings/admin" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                Admin Settings
-              </Link>
-            </CardContent>
-          </Card>
+              <div>
+                <h2 className="text-xl font-bold">Administration</h2>
+                <p className="text-sm text-muted-foreground">Family-wide settings</p>
+              </div>
+            </div>
+            <Link
+              href="/settings/admin"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-all duration-200"
+            >
+              Admin Settings
+            </Link>
+          </div>
         )}
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={isSaving}>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200 hover:scale-105 disabled:opacity-50"
+          >
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-5 w-5" />
                 Save Changes
               </>
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </Layout>

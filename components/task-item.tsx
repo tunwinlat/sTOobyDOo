@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Task } from '@/types';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { formatDate, cn } from '@/lib/utils';
 import {
   CheckCircle2,
@@ -58,7 +56,7 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
       case 'medium':
         return <AlertCircle className="h-4 w-4 text-amber-500" />;
       case 'low':
-        return <AlertCircle className="h-4 w-4 text-blue-500" />;
+        return <AlertCircle className="h-4 w-4 text-emerald-500" />;
       default:
         return null;
     }
@@ -67,30 +65,30 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
   const getPriorityClass = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'text-red-500 bg-red-500/10 border-red-500/20';
+        return 'bg-red-500/10 text-red-500 border-red-500/20';
       case 'medium':
-        return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
+        return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
       case 'low':
-        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+        return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
       default:
-        return 'text-muted-foreground bg-muted';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   return (
-    <div className={cn('space-y-2', level > 0 && 'ml-8 border-l-2 border-muted pl-4')}>
+    <div className={cn('space-y-2', level > 0 && 'ml-8 border-l-2 border-purple-500/20 pl-4')}>
       <div
         className={cn(
-          'group flex items-start gap-3 p-4 rounded-lg border bg-card transition-all',
-          isCompleted && 'opacity-60 bg-muted/50',
-          !isCompleted && 'hover:border-primary/20 hover:shadow-sm'
+          'group flex items-start gap-3 p-5 rounded-2xl glass-card transition-all duration-200',
+          isCompleted && 'opacity-50',
+          !isCompleted && 'hover:shadow-lg hover:shadow-purple-500/10'
         )}
       >
         {/* Expand button for subtasks */}
         {hasSubtasks ? (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-0.5 text-muted-foreground hover:text-foreground transition-colors"
+            className="mt-0.5 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-white/5"
           >
             {isExpanded ? (
               <ChevronDown className="h-5 w-5" />
@@ -99,7 +97,7 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
             )}
           </button>
         ) : (
-          <div className="w-5" />
+          <div className="w-7" />
         )}
 
         {/* Complete toggle */}
@@ -107,44 +105,44 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
           onClick={handleToggleComplete}
           disabled={isLoading}
           className={cn(
-            'mt-0.5 flex-shrink-0 transition-colors',
-            isCompleted ? 'text-green-500' : 'text-muted-foreground hover:text-primary'
+            'mt-0.5 flex-shrink-0 transition-all duration-200 p-1 rounded-full',
+            isCompleted ? 'text-emerald-500' : 'text-muted-foreground hover:text-purple-400'
           )}
         >
           {isCompleted ? (
-            <CheckCircle2 className="h-5 w-5" />
+            <CheckCircle2 className="h-6 w-6" />
           ) : (
-            <Circle className="h-5 w-5" />
+            <Circle className="h-6 w-6" />
           )}
         </button>
 
         {/* Task content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2 flex-wrap">
+          <div className="flex items-start gap-3 flex-wrap">
             <Link
               href={`/lists/${task.listId}?task=${task.id}`}
               className={cn(
-                'font-medium hover:underline transition-colors',
+                'font-semibold text-lg hover:text-purple-400 transition-colors',
                 isCompleted && 'line-through text-muted-foreground'
               )}
             >
               {task.title}
             </Link>
-            <Badge variant="outline" className={cn('text-xs', getPriorityClass(task.priority))}>
+            <span className={cn('px-3 py-1 rounded-full text-xs font-medium border', getPriorityClass(task.priority))}>
               {getPriorityIcon(task.priority)}
               <span className="ml-1 capitalize">{task.priority}</span>
-            </Badge>
+            </span>
           </div>
 
           {task.description && (
-            <p className={cn('text-sm mt-1', isCompleted ? 'text-muted-foreground/70' : 'text-muted-foreground')}>
+            <p className={cn('text-sm mt-2', isCompleted ? 'text-muted-foreground/70' : 'text-muted-foreground')}>
               {task.description}
             </p>
           )}
 
-          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
             {showList && task.list && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5">
                 <List className="h-3 w-3" />
                 <span style={{ color: task.list.color }}>{task.list.name}</span>
               </div>
@@ -152,8 +150,8 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
             
             {task.dueDate && (
               <div className={cn(
-                'flex items-center gap-1',
-                new Date(task.dueDate) < new Date() && !isCompleted && 'text-red-500'
+                'flex items-center gap-1.5 px-2 py-1 rounded-lg',
+                new Date(task.dueDate) < new Date() && !isCompleted ? 'bg-red-500/10 text-red-400' : 'bg-white/5'
               )}>
                 <Clock className="h-3 w-3" />
                 <span>Due {formatDate(task.dueDate)}</span>
@@ -161,14 +159,14 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
             )}
 
             {task.assignedTo && (
-              <div className="flex items-center gap-1">
-                <span className="text-primary">@{task.assignedTo.name}</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-500/10">
+                <span className="text-purple-400 font-medium">@{task.assignedTo.name}</span>
               </div>
             )}
 
             {hasSubtasks && (
-              <div className="flex items-center gap-1">
-                <span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5">
+                <span className="text-muted-foreground">
                   {task.subtasks?.filter((st) => st.isCompleted).length || 0}/{task.subtasks?.length || 0} subtasks
                 </span>
               </div>
