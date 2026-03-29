@@ -245,6 +245,32 @@ Add to Cursor MCP settings:
 - **Priority Levels**: low, medium, high
 - **List Access Control**: Restrict tokens to specific lists
 
+#### Working with Subtasks via MCP
+
+Subtasks are fully supported through MCP. Here's how to work with them:
+
+**Creating a Subtask:**
+```json
+{
+  "listId": "list-uuid",
+  "title": "Buy milk",
+  "parentId": "parent-task-uuid"
+}
+```
+- Use `create_task` with a `parentId` to create a subtask
+- Maximum nesting: 2 levels deep (task → subtask → sub-subtask)
+
+**Managing Subtasks:**
+- All task operations work on subtasks using their ID
+- Use `get_task` with a parent task ID to see its subtasks
+- `complete_task`, `update_task`, `delete_task` all work with subtask IDs
+
+**Example Workflow:**
+1. Create main task: `create_task` → returns task ID
+2. Create subtask: `create_task` with `parentId` set to main task ID
+3. Complete subtask: `complete_task` with subtask ID
+4. When all subtasks complete, complete main task
+
 ### Default MCP Token Permissions
 
 When creating a new MCP token, these are the default permissions:
