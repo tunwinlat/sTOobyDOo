@@ -12,15 +12,17 @@ const memberSchema = z.object({
 });
 
 // Check if user is admin
-async function checkAdmin(session: any) {
-  if (!session?.user?.id) return false;
+async function checkAdmin(session: any): Promise<{ isAdmin: boolean; familyId: string | null }> {
+  if (!session?.user?.id) {
+    return { isAdmin: false, familyId: null };
+  }
   
   const member = await prisma.familyMember.findUnique({
     where: { id: session.user.id },
     select: { isAdmin: true, familyId: true },
   });
   
-  return { isAdmin: member?.isAdmin ?? false, familyId: member?.familyId };
+  return { isAdmin: member?.isAdmin ?? false, familyId: member?.familyId ?? null };
 }
 
 // Add new family member
