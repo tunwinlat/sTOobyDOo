@@ -11,7 +11,7 @@ export function formatDate(date: string | Date | null): string {
   return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'd' === new Date().getFullYear() ? undefined : 'numeric',
+    year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
   });
 }
 
