@@ -406,8 +406,8 @@ async function executeTool(
           },
           ...(params?.listId ? { listId: params.listId } : {}),
           OR: [
-            { title: { contains: params.query, mode: 'insensitive' } },
-            { description: { contains: params.query, mode: 'insensitive' } },
+            { title: { contains: params.query } },
+            { description: { contains: params.query } },
           ],
           isArchived: false,
         },
