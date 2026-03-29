@@ -188,8 +188,8 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
                   {task.title}
                 </h4>
                 
-                {/* Action buttons */}
-                <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                {/* Action buttons - always visible */}
+                <div className="flex items-center gap-0.5">
                   <button
                     onClick={openEditModal}
                     className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all duration-200"

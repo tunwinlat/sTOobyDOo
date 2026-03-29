@@ -29,6 +29,7 @@ export default function ListDetailPage() {
   const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [activeTab, setActiveTab] = useState<'open' | 'completed'>('open');
@@ -74,8 +75,9 @@ export default function ListDetailPage() {
   };
 
   const handleCreateTask = useCallback(async () => {
-    if (!newTaskTitle.trim()) return;
+    if (!newTaskTitle.trim() || isCreatingTask) return;
 
+    setIsCreatingTask(true);
     try {
       const res = await fetch('/api/tasks', {
         method: 'POST',
@@ -96,8 +98,10 @@ export default function ListDetailPage() {
       }
     } catch (error) {
       console.error('Failed to create task:', error);
+    } finally {
+      setIsCreatingTask(false);
     }
-  }, [newTaskTitle, newTaskPriority, listId]);
+  }, [newTaskTitle, newTaskPriority, listId, isCreatingTask]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -242,7 +246,8 @@ export default function ListDetailPage() {
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
                 autoFocus
-                className="h-12 bg-white/[0.03] border-white/[0.08] rounded-xl text-base"
+                disabled={isCreatingTask}
+                className="h-12 bg-white/[0.03] border-white/[0.08] rounded-xl text-base disabled:opacity-50"
               />
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Priority:</span>
@@ -250,8 +255,9 @@ export default function ListDetailPage() {
                   {(['low', 'medium', 'high'] as const).map((priority) => (
                     <button
                       key={priority}
-                      onClick={() => setNewTaskPriority(priority)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all duration-200 border ${
+                      onClick={() => !isCreatingTask && setNewTaskPriority(priority)}
+                      disabled={isCreatingTask}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all duration-200 border disabled:opacity-50 ${
                         newTaskPriority === priority
                           ? getPriorityClass(priority)
                           : 'bg-white/[0.03] text-muted-foreground border-white/[0.06] hover:border-white/[0.1]'
@@ -267,16 +273,24 @@ export default function ListDetailPage() {
                     setIsCreating(false);
                     setNewTaskTitle('');
                   }}
-                  className="px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all"
+                  disabled={isCreatingTask}
+                  className="px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateTask}
-                  disabled={!newTaskTitle.trim()}
-                  className="px-5 py-2 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50"
+                  disabled={!newTaskTitle.trim() || isCreatingTask}
+                  className="px-5 py-2 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50 flex items-center gap-2"
                 >
-                  Create
+                  {isCreatingTask ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create'
+                  )}
                 </button>
               </div>
             </div>
