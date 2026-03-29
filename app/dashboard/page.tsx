@@ -91,6 +91,15 @@ export default function DashboardPage() {
     }
   };
 
+  const handleTaskDelete = (taskId: string) => {
+    setPriorityTasks(prev => prev.filter(t => t.id !== taskId));
+    setTodayTasks(prev => prev.filter(t => t.id !== taskId));
+    setStats(prev => ({
+      ...prev,
+      totalTasks: prev.totalTasks - 1,
+    }));
+  };
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -177,6 +186,7 @@ export default function DashboardPage() {
                     key={task.id}
                     task={task}
                     onComplete={handleTaskComplete}
+                    onDelete={handleTaskDelete}
                     showList
                   />
                 ))
@@ -213,6 +223,7 @@ export default function DashboardPage() {
                     key={task.id}
                     task={task}
                     onComplete={handleTaskComplete}
+                    onDelete={handleTaskDelete}
                     showList
                   />
                 ))

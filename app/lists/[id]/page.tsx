@@ -126,6 +126,11 @@ export default function ListDetailPage() {
     }
   };
 
+  const handleTaskDelete = (taskId: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setCompletedTasks((prev) => prev.filter((t) => t.id !== taskId));
+  };
+
   const getPriorityClass = (priority: string) => {
     switch (priority) {
       case 'high':
@@ -202,8 +207,8 @@ export default function ListDetailPage() {
             onClick={() => setActiveTab('open')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               activeTab === 'open'
-                ? 'bg-white/[0.08] text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-foreground text-background shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
             }`}
           >
             <Circle className="h-4 w-4" />
@@ -213,8 +218,8 @@ export default function ListDetailPage() {
             onClick={() => setActiveTab('completed')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
               activeTab === 'completed'
-                ? 'bg-white/[0.08] text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-foreground text-background shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
             }`}
           >
             <CheckCircle2 className="h-4 w-4" />
@@ -302,6 +307,7 @@ export default function ListDetailPage() {
                     key={task.id}
                     task={task}
                     onComplete={handleTaskComplete}
+                    onDelete={handleTaskDelete}
                     showList={false}
                   />
                 ))
@@ -320,6 +326,7 @@ export default function ListDetailPage() {
                 key={task.id}
                 task={task}
                 onComplete={handleTaskComplete}
+                onDelete={handleTaskDelete}
                 showList={false}
               />
             ))
