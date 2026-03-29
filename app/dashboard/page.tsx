@@ -100,6 +100,11 @@ export default function DashboardPage() {
     }));
   };
 
+  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
+    setPriorityTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+    setTodayTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+  };
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -187,6 +192,7 @@ export default function DashboardPage() {
                     task={task}
                     onComplete={handleTaskComplete}
                     onDelete={handleTaskDelete}
+                    onUpdate={handleTaskUpdate}
                     showList
                   />
                 ))
@@ -224,6 +230,7 @@ export default function DashboardPage() {
                     task={task}
                     onComplete={handleTaskComplete}
                     onDelete={handleTaskDelete}
+                    onUpdate={handleTaskUpdate}
                     showList
                   />
                 ))

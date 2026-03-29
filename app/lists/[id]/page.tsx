@@ -131,6 +131,11 @@ export default function ListDetailPage() {
     setCompletedTasks((prev) => prev.filter((t) => t.id !== taskId));
   };
 
+  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
+    setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, ...updates } : t));
+    setCompletedTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, ...updates } : t));
+  };
+
   const getPriorityClass = (priority: string) => {
     switch (priority) {
       case 'high':
@@ -308,6 +313,7 @@ export default function ListDetailPage() {
                     task={task}
                     onComplete={handleTaskComplete}
                     onDelete={handleTaskDelete}
+                    onUpdate={handleTaskUpdate}
                     showList={false}
                   />
                 ))
@@ -327,6 +333,7 @@ export default function ListDetailPage() {
                 task={task}
                 onComplete={handleTaskComplete}
                 onDelete={handleTaskDelete}
+                onUpdate={handleTaskUpdate}
                 showList={false}
               />
             ))
