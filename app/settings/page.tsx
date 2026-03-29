@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+// Switch component is defined below
 import { Loader2, Save, Bell, Mail, User, Shield, Cpu } from 'lucide-react';
 import Link from 'next/link';
 
