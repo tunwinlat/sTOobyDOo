@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       list: {
         familyId: session.user.familyId,
       },
+      parentId: null, // Only get top-level tasks, not subtasks
     };
 
     if (listId) {

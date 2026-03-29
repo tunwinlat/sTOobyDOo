@@ -52,7 +52,6 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleToggleComplete = async () => {
     if (isLoading) return;
@@ -176,14 +175,9 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <h4 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditModal(e);
-                  }}
-                  className={`font-medium text-sm leading-relaxed cursor-pointer hover:text-foreground/80 transition-colors ${
+                  className={`font-medium text-sm leading-relaxed ${
                     isCompleted ? 'line-through text-muted-foreground' : ''
                   }`}
-                  title="Click to edit task"
                 >
                   {task.title}
                 </h4>
@@ -277,7 +271,7 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
               
               {/* Subtasks */}
               {hasSubtasks && (
-                <div className="space-y-2">
+                <div className="space-y-2 mt-3">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium text-muted-foreground">Subtasks</p>
                     <button
@@ -291,24 +285,19 @@ export function TaskItem({ task, onComplete, onDelete, onUpdate, showList = fals
                       Add subtask
                     </button>
                   </div>
-                  {task.subtasks?.map((subtask) => (
-                    <div key={subtask.id} className="flex items-start gap-2 group/subtask">
-                      <div className={`mt-1 flex-shrink-0 w-3.5 h-3.5 rounded border ${
-                        subtask.isCompleted ? 'bg-emerald-500/20 border-emerald-500/50' : 'border-white/[0.15]'
-                      }`}>
-                        {subtask.isCompleted && <Check className="h-2.5 w-2.5 m-auto text-emerald-400" />}
-                      </div>
-                      <span className={`text-sm flex-1 ${subtask.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
-                        {subtask.title}
-                      </span>
-                      {/* Nested subtasks indicator */}
-                      {subtask.subtasks && subtask.subtasks.length > 0 && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {subtask.subtasks.length} more
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                  <div className="space-y-2">
+                    {task.subtasks?.map((subtask) => (
+                      <TaskItem
+                        key={subtask.id}
+                        task={subtask}
+                        onComplete={onComplete}
+                        onDelete={onDelete}
+                        onUpdate={onUpdate}
+                        showList={false}
+                        level={level + 1}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
 
