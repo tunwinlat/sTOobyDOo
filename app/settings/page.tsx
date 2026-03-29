@@ -41,7 +41,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({
     name: '',
     email: '',
-    emailNotifications: true,
+    emailNotifications: false,
     pushNotifications: false,
     pushoverUserKey: '',
   });
@@ -65,7 +65,7 @@ export default function SettingsPage() {
         setSettings({
           name: data.name || '',
           email: data.email || '',
-          emailNotifications: data.emailNotifications ?? true,
+          emailNotifications: data.emailNotifications ?? false,
           pushNotifications: data.pushNotifications ?? false,
           pushoverUserKey: data.pushoverUserKey || '',
         });

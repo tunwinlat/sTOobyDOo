@@ -38,7 +38,7 @@ model FamilyMember {
   
   // User-specific notification settings (override global if set)
   pushoverUserKey   String?
-  emailNotifications Boolean @default(true)
+  emailNotifications Boolean @default(false)
   pushNotifications  Boolean @default(false)
   
   family        Family   @relation(fields: [familyId], references: [id], onDelete: Cascade)

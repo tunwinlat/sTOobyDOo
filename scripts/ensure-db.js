@@ -95,7 +95,7 @@ async function ensureDatabase() {
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         pushoverUserKey TEXT,
-        emailNotifications BOOLEAN DEFAULT 1,
+        emailNotifications BOOLEAN DEFAULT 0,
         pushNotifications BOOLEAN DEFAULT 0,
         FOREIGN KEY (familyId) REFERENCES Family(id) ON DELETE CASCADE
       );
