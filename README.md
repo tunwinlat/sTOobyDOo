@@ -315,6 +315,49 @@ When creating a new MCP token, these are the default permissions:
 
 ---
 
+## ⏰ Reminder Scheduling
+
+To send reminder notifications at the scheduled time, you need to periodically call the reminders API. Here are your options:
+
+### Option 1: GitHub Actions (Free)
+
+The repo includes a GitHub Actions workflow (`.github/workflows/reminders.yml`) that runs every 5 minutes and calls your reminders endpoint.
+
+**Setup:**
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+2. Add these repository secrets:
+   - `VERCEL_URL`: Your deployed app URL (e.g., `https://your-app.vercel.app`)
+   - `CRON_SECRET`: A random secret string (same as your `CRON_SECRET` env var)
+
+**Note:** GitHub Actions free tier has a 2,000 minutes/month limit. Running every 5 minutes uses ~2,160 minutes/month, so you may want to adjust the frequency:
+
+```yaml
+# In .github/workflows/reminders.yml, change to every 10 minutes:
+- cron: '*/10 * * * *'  # Uses ~1,080 minutes/month
+```
+
+### Option 2: External Cron Service (Free Tiers Available)
+
+Services that can call your endpoint on a schedule:
+
+| Service | Free Tier | Frequency |
+|---------|-----------|-----------|
+| [cron-job.org](https://cron-job.org) | Unlimited | Min every 1 min |
+| [Easycron](https://www.easycron.com) | 200 calls/day | Hourly only |
+| [UptimeRobot](https://uptimerobot.com) | 50 monitors | Every 5 min |
+
+**Setup:**
+1. Sign up for the service
+2. Create a new cron job/heartbeat
+3. URL: `https://your-app.vercel.app/api/cron/reminders`
+4. Add header: `Authorization: Bearer YOUR_CRON_SECRET`
+
+### Option 3: In-App Polling (No Setup Required)
+
+When users interact with the app, it automatically checks for due reminders. This means reminders might be delayed until someone opens the app, but requires no external setup.
+
+---
+
 ## 🔒 Data Safety
 
 **Your data is safe during redeploys.** The app uses a smart initialization script (`scripts/ensure-db.js`) that:
