@@ -145,9 +145,9 @@ export default function ListDetailPage() {
       <Layout>
         <div className="text-center py-12">
           <p className="text-muted-foreground">List not found</p>
-          <Button className="mt-4" asChild>
-            <Link href="/lists">Go back to lists</Link>
-          </Button>
+          <Link href="/lists" className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-4">
+            Go back to lists
+          </Link>
         </div>
       </Layout>
     );
@@ -159,11 +159,9 @@ export default function ListDetailPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/lists">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
+            <Link href="/lists" className="inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground h-10 w-10">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">{list.name}</h1>
               {list.description && (

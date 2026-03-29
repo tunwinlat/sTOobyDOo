@@ -225,9 +225,9 @@ export default function SettingsPage() {
               Create MCP tokens to allow LLMs (like Claude, GPT, etc.) to access and manage your tasks.
               You can create multiple tokens with different permissions.
             </p>
-            <Button variant="outline" asChild>
-              <Link href="/settings/mcp">Manage MCP Tokens</Link>
-            </Button>
+            <Link href="/settings/mcp" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+              Manage MCP Tokens
+            </Link>
           </CardContent>
         </Card>
 
@@ -242,9 +242,9 @@ export default function SettingsPage() {
               <CardDescription>Family-wide settings</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" asChild>
-                <Link href="/settings/admin">Admin Settings</Link>
-              </Button>
+              <Link href="/settings/admin" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                Admin Settings
+              </Link>
             </CardContent>
           </Card>
         )}
