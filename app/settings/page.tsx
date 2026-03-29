@@ -18,13 +18,15 @@ function SimpleSwitch({
   return (
     <button
       onClick={() => onCheckedChange(!checked)}
-      className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${
-        checked ? 'bg-foreground/80' : 'bg-white/[0.08]'
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200 ${
+        checked 
+          ? 'bg-emerald-500' 
+          : 'bg-slate-300 dark:bg-slate-700'
       }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
-          checked ? 'translate-x-5' : 'translate-x-1'
+        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+          checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
     </button>
