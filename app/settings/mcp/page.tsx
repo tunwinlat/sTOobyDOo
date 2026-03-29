@@ -16,6 +16,8 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
+  Edit3,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -63,6 +65,17 @@ export default function McpSettingsPage() {
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revealedTokens, setRevealedTokens] = useState<Set<string>>(new Set());
+  const [editingToken, setEditingToken] = useState<McpToken | null>(null);
+  const [editPermissions, setEditPermissions] = useState({
+    allowAllLists: true,
+    canCreateTasks: true,
+    canCompleteTasks: true,
+    canEditTasks: true,
+    canDeleteTasks: false,
+    canCreateLists: false,
+    canEditLists: false,
+    canDeleteLists: false,
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -126,6 +139,44 @@ export default function McpSettingsPage() {
 
   const togglePermission = (key: keyof typeof newTokenPermissions) => {
     setNewTokenPermissions(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const startEditingToken = (token: McpToken) => {
+    setEditingToken(token);
+    setEditPermissions({
+      allowAllLists: token.allowAllLists,
+      canCreateTasks: token.canCreateTasks,
+      canCompleteTasks: token.canCompleteTasks,
+      canEditTasks: token.canEditTasks,
+      canDeleteTasks: token.canDeleteTasks,
+      canCreateLists: token.canCreateLists,
+      canEditLists: token.canEditLists,
+      canDeleteLists: token.canDeleteLists,
+    });
+  };
+
+  const handleUpdateToken = async () => {
+    if (!editingToken) return;
+
+    try {
+      const res = await fetch(`/api/mcp-tokens/${editingToken.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editPermissions),
+      });
+
+      if (res.ok) {
+        const updatedToken = await res.json();
+        setTokens((prev) => prev.map((t) => t.id === updatedToken.id ? updatedToken : t));
+        setEditingToken(null);
+      }
+    } catch (error) {
+      console.error('Failed to update token:', error);
+    }
+  };
+
+  const toggleEditPermission = (key: keyof typeof editPermissions) => {
+    setEditPermissions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleDeleteToken = async (tokenId: string) => {
@@ -338,23 +389,107 @@ export default function McpSettingsPage() {
           ) : (
             tokens.map((token) => (
               <div key={token.id} className="glass-card rounded-2xl p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="font-medium">{token.name}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Created {new Date(token.createdAt).toLocaleDateString()}
-                      {token.lastUsedAt && (
-                        <span> • Last used {new Date(token.lastUsedAt).toLocaleDateString()}</span>
-                      )}
-                    </p>
+                {editingToken?.id === token.id ? (
+                  /* Edit Mode */
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Edit Permissions</h3>
+                      <button
+                        onClick={() => setEditingToken(null)}
+                        className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-all"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <PermissionToggle
+                        label="Create Tasks"
+                        checked={editPermissions.canCreateTasks}
+                        onChange={() => toggleEditPermission('canCreateTasks')}
+                      />
+                      <PermissionToggle
+                        label="Complete Tasks"
+                        checked={editPermissions.canCompleteTasks}
+                        onChange={() => toggleEditPermission('canCompleteTasks')}
+                      />
+                      <PermissionToggle
+                        label="Edit Tasks"
+                        checked={editPermissions.canEditTasks}
+                        onChange={() => toggleEditPermission('canEditTasks')}
+                      />
+                      <PermissionToggle
+                        label="Delete Tasks"
+                        checked={editPermissions.canDeleteTasks}
+                        onChange={() => toggleEditPermission('canDeleteTasks')}
+                      />
+                      <PermissionToggle
+                        label="Create Lists"
+                        checked={editPermissions.canCreateLists}
+                        onChange={() => toggleEditPermission('canCreateLists')}
+                      />
+                      <PermissionToggle
+                        label="Edit Lists"
+                        checked={editPermissions.canEditLists}
+                        onChange={() => toggleEditPermission('canEditLists')}
+                      />
+                      <PermissionToggle
+                        label="Delete Lists"
+                        checked={editPermissions.canDeleteLists}
+                        onChange={() => toggleEditPermission('canDeleteLists')}
+                      />
+                      <PermissionToggle
+                        label="All Lists Access"
+                        checked={editPermissions.allowAllLists}
+                        onChange={() => toggleEditPermission('allowAllLists')}
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        onClick={() => setEditingToken(null)}
+                        className="flex-1 px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={handleUpdateToken}
+                        className="flex-1 px-4 py-2 rounded-xl btn-primary text-white text-sm font-medium"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleDeleteToken(token.id)}
-                    className="p-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+                ) : (
+                  /* View Mode */
+                  <>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="font-medium">{token.name}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          Created {new Date(token.createdAt).toLocaleDateString()}
+                          {token.lastUsedAt && (
+                            <span> • Last used {new Date(token.lastUsedAt).toLocaleDateString()}</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => startEditingToken(token)}
+                          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all"
+                          title="Edit permissions"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteToken(token.id)}
+                          className="p-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
+                          title="Delete token"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
 
                 {/* Token Display */}
                 <div className="space-y-1.5 mb-4">
@@ -451,6 +586,8 @@ export default function McpSettingsPage() {
                     </div>
                   )}
                 </div>
+                  </>
+                )}
               </div>
             ))
           )}
