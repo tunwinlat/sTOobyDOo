@@ -111,9 +111,6 @@ export async function POST(request: NextRequest) {
       where: {
         id: validatedData.listId,
         familyId: session.user.familyId,
-        OR: [
-          { shares: { some: { memberId: session.user.id } } },
-        ],
       },
     });
 

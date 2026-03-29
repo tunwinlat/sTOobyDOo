@@ -19,7 +19,7 @@ function SimpleSwitch({
     <button
       onClick={() => onCheckedChange(!checked)}
       className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-        checked ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-white/10'
+        checked ? 'bg-primary' : 'bg-white/10'
       }`}
     >
       <span
@@ -57,7 +57,7 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('/api/user');
+      const res = await fetch('/api/user', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setSettings({
@@ -109,7 +109,7 @@ export default function SettingsPage() {
       <div className="space-y-8 max-w-2xl">
         {/* Header */}
         <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-foreground">
             Settings
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -120,8 +120,8 @@ export default function SettingsPage() {
         {/* Profile Settings */}
         <div className="glass-card rounded-3xl p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <User className="h-6 w-6 text-white" />
+            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center">
+              <User className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
               <h2 className="text-xl font-bold">Profile</h2>
@@ -155,8 +155,8 @@ export default function SettingsPage() {
         {/* Notification Settings */}
         <div className="glass-card rounded-3xl p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-              <Bell className="h-6 w-6 text-white" />
+            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center">
+              <Bell className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
               <h2 className="text-xl font-bold">Notifications</h2>
