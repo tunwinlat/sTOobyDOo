@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Layout } from '@/components/layout';
 import { Input } from '@/components/ui/input';
-import { Loader2, Save, Bell, Mail, User, Shield, Cpu } from 'lucide-react';
+import { Loader2, Save, Bell, Mail, User, Shield, Cpu, Check } from 'lucide-react';
 import Link from 'next/link';
 
 function SimpleSwitch({ 
@@ -38,6 +38,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [settings, setSettings] = useState({
     name: '',
     email: '',
@@ -83,11 +84,27 @@ export default function SettingsPage() {
       const res = await fetch('/api/user', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({
+          name: settings.name,
+          emailNotifications: settings.emailNotifications,
+          pushNotifications: settings.pushNotifications,
+          pushoverUserKey: settings.pushoverUserKey || null,
+        }),
       });
 
       if (res.ok) {
-        // Show success feedback
+        const updatedUser = await res.json();
+        setSettings(prev => ({
+          ...prev,
+          name: updatedUser.name,
+          emailNotifications: updatedUser.emailNotifications,
+          pushNotifications: updatedUser.pushNotifications,
+          pushoverUserKey: updatedUser.pushoverUserKey || '',
+        }));
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2000);
+      } else {
+        console.error('Failed to save settings');
       }
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -269,12 +286,21 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50"
+            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-medium disabled:opacity-50 transition-all ${
+              saveSuccess 
+                ? 'bg-emerald-500 hover:bg-emerald-500' 
+                : 'btn-primary'
+            }`}
           >
             {isSaving ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Saving...
+              </>
+            ) : saveSuccess ? (
+              <>
+                <Check className="h-4 w-4" />
+                Saved!
               </>
             ) : (
               <>
