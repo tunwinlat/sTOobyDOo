@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import Pushover from 'pushover-js';
+import { Pushover } from 'pushover-js';
 import { prisma } from './db';
 
 interface NotificationPayload {
@@ -56,7 +56,7 @@ export async function sendNotification(
       const userKey = member.pushoverUserKey || family.pushoverUserKey || process.env.PUSHOVER_USER_KEY;
       
       if (appToken && userKey) {
-        const pushover = new Pushover(appToken, userKey);
+        const pushover = new Pushover(userKey, appToken);
         await pushover.send(payload.title, payload.message);
         results.push = true;
       }
