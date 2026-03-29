@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -8,15 +7,14 @@ const globalForPrisma = globalThis as unknown as {
 
 function getPrismaClient() {
   const databaseUrl = process.env.DATABASE_URL;
+  const authToken = process.env.DATABASE_AUTH_TOKEN;
   
   // Check if using remote libsql (Turso, Bunny, etc.)
   if (databaseUrl?.startsWith('libsql://') || databaseUrl?.startsWith('https://')) {
-    const libsql = createClient({
+    const adapter = new PrismaLibSql({
       url: databaseUrl,
-      authToken: process.env.DATABASE_AUTH_TOKEN,
+      authToken: authToken,
     });
-    
-    const adapter = new PrismaLibSql(libsql);
     return new PrismaClient({ adapter });
   }
   
