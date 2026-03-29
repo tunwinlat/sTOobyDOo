@@ -18,13 +18,13 @@ function SimpleSwitch({
   return (
     <button
       onClick={() => onCheckedChange(!checked)}
-      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-        checked ? 'bg-primary' : 'bg-white/10'
+      className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors ${
+        checked ? 'bg-foreground/80' : 'bg-white/[0.08]'
       }`}
     >
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-          checked ? 'translate-x-6' : 'translate-x-1'
+        className={`inline-block h-4 w-4 transform rounded-full bg-background transition-transform ${
+          checked ? 'translate-x-5' : 'translate-x-1'
         }`}
       />
     </button>
@@ -97,8 +97,8 @@ export default function SettingsPage() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="glass-card rounded-3xl p-8">
-          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full" />
+        <div className="glass-card rounded-2xl p-8">
+          <div className="animate-spin h-6 w-6 border-2 border-slate-400 border-t-transparent rounded-full" />
         </div>
       </div>
     );
@@ -106,72 +106,72 @@ export default function SettingsPage() {
 
   return (
     <Layout>
-      <div className="space-y-8 max-w-2xl">
+      <div className="space-y-6 max-w-2xl">
         {/* Header */}
         <div>
-          <h1 className="text-4xl font-bold text-foreground">
+          <h1 className="text-3xl font-semibold text-foreground mb-1">
             Settings
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground text-sm">
             Manage your account and preferences
           </p>
         </div>
 
         {/* Profile Settings */}
-        <div className="glass-card rounded-3xl p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center">
-              <User className="h-6 w-6 text-primary-foreground" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <User className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">Profile</h2>
-              <p className="text-sm text-muted-foreground">Your personal information</p>
+              <h2 className="font-medium">Profile</h2>
+              <p className="text-xs text-muted-foreground">Your personal information</p>
             </div>
           </div>
           
           <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Name</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Name</label>
               <Input
                 value={settings.name}
                 onChange={(e) => setSettings((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Your name"
-                className="bg-white/5 border-white/10 rounded-xl"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Email</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Email</label>
               <Input
                 type="email"
                 value={settings.email}
                 disabled
-                className="bg-white/5 border-white/10 rounded-xl opacity-50"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm opacity-50"
               />
-              <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+              <p className="text-[10px] text-muted-foreground">Email cannot be changed</p>
             </div>
           </div>
         </div>
 
         {/* Notification Settings */}
-        <div className="glass-card rounded-3xl p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center">
-              <Bell className="h-6 w-6 text-primary-foreground" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Bell className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">Notifications</h2>
-              <p className="text-sm text-muted-foreground">How you want to be notified</p>
+              <h2 className="font-medium">Notifications</h2>
+              <p className="text-xs text-muted-foreground">How you want to be notified</p>
             </div>
           </div>
           
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5">
-              <div className="space-y-1">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <label className="font-medium">Email Notifications</label>
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                  <label className="text-sm font-medium">Email Notifications</label>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Receive email updates about your tasks
                 </p>
               </div>
@@ -183,13 +183,13 @@ export default function SettingsPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5">
-              <div className="space-y-1">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-muted-foreground" />
-                  <label className="font-medium">Push Notifications</label>
+                  <Bell className="h-3.5 w-3.5 text-muted-foreground" />
+                  <label className="text-sm font-medium">Push Notifications</label>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Receive push notifications via Pushover
                 </p>
               </div>
@@ -202,15 +202,15 @@ export default function SettingsPage() {
             </div>
 
             {settings.pushNotifications && (
-              <div className="space-y-2 pt-4 border-t border-white/10">
-                <label className="text-sm font-medium text-muted-foreground">Pushover User Key</label>
+              <div className="space-y-1.5 pt-3 border-t border-white/[0.06]">
+                <label className="text-xs font-medium text-muted-foreground">Pushover User Key</label>
                 <Input
                   value={settings.pushoverUserKey}
                   onChange={(e) =>
                     setSettings((prev) => ({ ...prev, pushoverUserKey: e.target.value }))
                   }
                   placeholder="Your Pushover user key"
-                  className="bg-white/5 border-white/10 rounded-xl"
+                  className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
                 />
               </div>
             )}
@@ -218,24 +218,24 @@ export default function SettingsPage() {
         </div>
 
         {/* MCP Tokens */}
-        <div className="glass-card rounded-3xl p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
-              <Cpu className="h-6 w-6 text-white" />
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Cpu className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <h2 className="text-xl font-bold">MCP Integration</h2>
-              <p className="text-sm text-muted-foreground">Manage LLM access to your tasks</p>
+              <h2 className="font-medium">MCP Integration</h2>
+              <p className="text-xs text-muted-foreground">Manage LLM access to your tasks</p>
             </div>
           </div>
           
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-xs text-muted-foreground mb-4">
             Create MCP tokens to allow LLMs (like Claude, GPT, etc.) to access and manage your tasks.
             You can create multiple tokens with different permissions.
           </p>
           <Link
             href="/settings/mcp"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-all duration-200"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-ghost text-sm font-medium"
           >
             Manage MCP Tokens
           </Link>
@@ -243,19 +243,19 @@ export default function SettingsPage() {
 
         {/* Admin Settings Link (only for admins) */}
         {session?.user?.isAdmin && (
-          <div className="glass-card rounded-3xl p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-white" />
+          <div className="glass-card rounded-2xl p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                <Shield className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Administration</h2>
-                <p className="text-sm text-muted-foreground">Family-wide settings</p>
+                <h2 className="font-medium">Administration</h2>
+                <p className="text-xs text-muted-foreground">Family-wide settings</p>
               </div>
             </div>
             <Link
               href="/settings/admin"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 text-white font-medium hover:bg-white/10 transition-all duration-200"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-ghost text-sm font-medium"
             >
               Admin Settings
             </Link>
@@ -267,16 +267,16 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-200 hover:scale-105 disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50"
           >
             {isSaving ? (
               <>
-                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="h-5 w-5" />
+                <Save className="h-4 w-4" />
                 Save Changes
               </>
             )}

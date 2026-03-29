@@ -26,6 +26,7 @@ export interface List {
   createdAt: string;
   updatedAt: string;
   isArchived: boolean;
+  tasks?: Task[];
   _count?: {
     tasks: number;
   };

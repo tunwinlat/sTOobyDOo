@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Layout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Save, Shield, Bell, Mail, UserPlus, Users } from 'lucide-react';
+import { Loader2, Save, Shield, Bell, Mail, UserPlus, Users, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 interface FamilySettings {
   name: string;
@@ -105,172 +103,211 @@ export default function AdminSettingsPage() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="glass-card rounded-2xl p-8">
+          <div className="animate-spin h-6 w-6 border-2 border-slate-400 border-t-transparent rounded-full" />
+        </div>
       </div>
     );
   }
 
   if (!session?.user?.isAdmin) {
-    return null; // Will redirect
+    return null;
   }
 
   return (
     <Layout>
       <div className="space-y-6 max-w-2xl">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Settings</h1>
-          <p className="text-muted-foreground">
-            Manage family-wide settings and members
-          </p>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/settings" 
+            className="inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/[0.03] h-10 w-10 transition-all"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground mb-0.5">
+              Admin Settings
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Manage family-wide settings and members
+            </p>
+          </div>
         </div>
 
         {/* Family Info */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <CardTitle>Family Information</CardTitle>
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Shield className="h-5 w-5 text-muted-foreground" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Family Name</label>
-              <Input
-                value={settings?.name || ''}
-                onChange={(e) => setSettings((prev) => prev ? { ...prev, name: e.target.value } : null)}
-                placeholder="Family name"
-              />
+            <div>
+              <h2 className="font-medium">Family Information</h2>
+              <p className="text-xs text-muted-foreground">Your family name</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground">Family Name</label>
+            <Input
+              value={settings?.name || ''}
+              onChange={(e) => setSettings((prev) => prev ? { ...prev, name: e.target.value } : null)}
+              placeholder="Family name"
+              className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
+            />
+          </div>
+        </div>
 
         {/* Global Notifications */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <CardTitle>Global Notification Settings</CardTitle>
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Bell className="h-5 w-5 text-muted-foreground" />
             </div>
-            <CardDescription>Default notification settings for the family</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Pushover App Token</label>
+            <div>
+              <h2 className="font-medium">Notification Settings</h2>
+              <p className="text-xs text-muted-foreground">Global notification configuration</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Pushover App Token</label>
               <Input
                 value={settings?.pushoverAppToken || ''}
                 onChange={(e) => setSettings((prev) => prev ? { ...prev, pushoverAppToken: e.target.value } : null)}
                 placeholder="Pushover app token"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Pushover User Key</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Pushover User Key</label>
               <Input
                 value={settings?.pushoverUserKey || ''}
                 onChange={(e) => setSettings((prev) => prev ? { ...prev, pushoverUserKey: e.target.value } : null)}
                 placeholder="Pushover user key"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Mail className="h-4 w-4" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Mail className="h-3 w-3" />
                 Resend API Key
               </label>
               <Input
                 value={settings?.resendApiKey || ''}
                 onChange={(e) => setSettings((prev) => prev ? { ...prev, resendApiKey: e.target.value } : null)}
                 placeholder="Resend API key"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">From Email</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">From Email</label>
               <Input
                 type="email"
                 value={settings?.resendFromEmail || ''}
                 onChange={(e) => setSettings((prev) => prev ? { ...prev, resendFromEmail: e.target.value } : null)}
                 placeholder="noreply@yourdomain.com"
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Family Members */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              <CardTitle>Family Members</CardTitle>
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Users className="h-5 w-5 text-muted-foreground" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              {settings?.members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                  <div>
-                    <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">{member.email}</p>
-                  </div>
-                  {member.isAdmin && (
-                    <Badge variant="secondary">Admin</Badge>
-                  )}
-                </div>
-              ))}
+            <div>
+              <h2 className="font-medium">Family Members</h2>
+              <p className="text-xs text-muted-foreground">Manage family members</p>
             </div>
-
-            {isAddingMember ? (
-              <div className="space-y-3 pt-4 border-t">
-                <p className="font-medium">Add New Member</p>
-                <Input
-                  placeholder="Name"
-                  value={newMember.name}
-                  onChange={(e) => setNewMember((prev) => ({ ...prev, name: e.target.value }))}
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={newMember.email}
-                  onChange={(e) => setNewMember((prev) => ({ ...prev, email: e.target.value }))}
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={newMember.password}
-                  onChange={(e) => setNewMember((prev) => ({ ...prev, password: e.target.value }))}
-                />
-                <div className="flex gap-2">
-                  <Button onClick={handleAddMember}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add Member
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsAddingMember(false)}>
-                    Cancel
-                  </Button>
+          </div>
+          <div className="space-y-2">
+            {settings?.members.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div>
+                  <p className="font-medium text-sm">{member.name}</p>
+                  <p className="text-xs text-muted-foreground">{member.email}</p>
                 </div>
+                {member.isAdmin && (
+                  <span className="px-2 py-1 rounded-lg text-[10px] font-medium bg-white/[0.06] text-foreground border border-white/[0.1]">
+                    Admin
+                  </span>
+                )}
               </div>
-            ) : (
-              <Button variant="outline" onClick={() => setIsAddingMember(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Member
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+            ))}
+          </div>
+
+          {isAddingMember ? (
+            <div className="space-y-3 pt-4 border-t border-white/[0.06] mt-4">
+              <p className="font-medium text-sm">Add New Member</p>
+              <Input
+                placeholder="Name"
+                value={newMember.name}
+                onChange={(e) => setNewMember((prev) => ({ ...prev, name: e.target.value }))}
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
+              />
+              <Input
+                type="email"
+                placeholder="Email"
+                value={newMember.email}
+                onChange={(e) => setNewMember((prev) => ({ ...prev, email: e.target.value }))}
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={newMember.password}
+                onChange={(e) => setNewMember((prev) => ({ ...prev, password: e.target.value }))}
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
+              />
+              <div className="flex gap-2 pt-1">
+                <button 
+                  onClick={handleAddMember}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-primary text-white text-sm font-medium"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Add Member
+                </button>
+                <button 
+                  onClick={() => setIsAddingMember(false)}
+                  className="px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setIsAddingMember(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 mt-4 rounded-xl btn-ghost text-sm font-medium"
+            >
+              <UserPlus className="h-4 w-4" />
+              Add Member
+            </button>
+          )}
+        </div>
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={isSaving}>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50"
+          >
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4" />
                 Save Changes
               </>
             )}
-          </Button>
+          </button>
         </div>
       </div>
     </Layout>

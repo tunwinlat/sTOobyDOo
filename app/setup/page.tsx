@@ -112,201 +112,201 @@ export default function SetupPage() {
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 flex items-center justify-center text-white font-bold text-3xl shadow-2xl shadow-purple-500/30 mx-auto mb-6">
+        <div className="text-center mb-6">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-semibold text-2xl border border-white/10 mx-auto mb-4">
             S
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-semibold text-foreground">
             sTOobyDOo
           </h1>
-          <p className="text-muted-foreground mt-2">Setup your family workspace</p>
+          <p className="text-muted-foreground text-sm mt-1">Setup your family workspace</p>
         </div>
 
-        <div className="glass-card rounded-3xl p-8">
+        <div className="glass-card rounded-2xl p-6">
           {/* Progress */}
-          <div className="flex gap-2 mb-8">
+          <div className="flex gap-1.5 mb-6">
             {steps.map((step, index) => (
               <div
                 key={step.id}
-                className={`flex-1 h-2 rounded-full transition-all duration-300 ${
+                className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
                   index <= currentStep 
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
-                    : 'bg-white/10'
+                    ? 'bg-foreground/60' 
+                    : 'bg-white/[0.06]'
                 }`}
               />
             ))}
           </div>
 
           {/* Step Header */}
-          <div className="text-center mb-8">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
-              <CurrentIcon className="h-8 w-8 text-purple-400" />
+          <div className="text-center mb-6">
+            <div className="h-12 w-12 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mx-auto mb-3">
+              <CurrentIcon className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h2 className="text-2xl font-bold">{steps[currentStep].title}</h2>
-            <p className="text-muted-foreground">{steps[currentStep].description}</p>
+            <h2 className="text-xl font-semibold">{steps[currentStep].title}</h2>
+            <p className="text-muted-foreground text-sm">{steps[currentStep].description}</p>
           </div>
 
           {/* Form Content */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             {currentStep === 0 && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Family Name</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Family Name</label>
                 <Input
                   placeholder="Enter your family name"
                   value={formData.familyName}
                   onChange={(e) => updateField('familyName', e.target.value)}
-                  className={`h-14 bg-white/5 border-white/10 rounded-xl text-lg ${errors.familyName ? 'border-red-500' : ''}`}
+                  className={`h-11 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm ${errors.familyName ? 'border-red-500/50' : ''}`}
                 />
                 {errors.familyName && (
-                  <p className="text-sm text-red-400">{errors.familyName}</p>
+                  <p className="text-xs text-red-400">{errors.familyName}</p>
                 )}
               </div>
             )}
 
             {currentStep === 1 && (
-              <div className="space-y-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Your Name</label>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Your Name</label>
                   <Input
                     placeholder="Enter your name"
                     value={formData.adminName}
                     onChange={(e) => updateField('adminName', e.target.value)}
-                    className={`h-14 bg-white/5 border-white/10 rounded-xl ${errors.adminName ? 'border-red-500' : ''}`}
+                    className={`h-11 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm ${errors.adminName ? 'border-red-500/50' : ''}`}
                   />
-                  {errors.adminName && <p className="text-sm text-red-400">{errors.adminName}</p>}
+                  {errors.adminName && <p className="text-xs text-red-400">{errors.adminName}</p>}
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Email</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Email</label>
                   <Input
                     type="email"
                     placeholder="Enter your email"
                     value={formData.adminEmail}
                     onChange={(e) => updateField('adminEmail', e.target.value)}
-                    className={`h-14 bg-white/5 border-white/10 rounded-xl ${errors.adminEmail ? 'border-red-500' : ''}`}
+                    className={`h-11 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm ${errors.adminEmail ? 'border-red-500/50' : ''}`}
                   />
-                  {errors.adminEmail && <p className="text-sm text-red-400">{errors.adminEmail}</p>}
+                  {errors.adminEmail && <p className="text-xs text-red-400">{errors.adminEmail}</p>}
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Password</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Password</label>
                   <Input
                     type="password"
                     placeholder="Create a password"
                     value={formData.adminPassword}
                     onChange={(e) => updateField('adminPassword', e.target.value)}
-                    className={`h-14 bg-white/5 border-white/10 rounded-xl ${errors.adminPassword ? 'border-red-500' : ''}`}
+                    className={`h-11 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm ${errors.adminPassword ? 'border-red-500/50' : ''}`}
                   />
-                  {errors.adminPassword && <p className="text-sm text-red-400">{errors.adminPassword}</p>}
+                  {errors.adminPassword && <p className="text-xs text-red-400">{errors.adminPassword}</p>}
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">Confirm Password</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Confirm Password</label>
                   <Input
                     type="password"
                     placeholder="Confirm your password"
                     value={formData.confirmPassword}
                     onChange={(e) => updateField('confirmPassword', e.target.value)}
-                    className={`h-14 bg-white/5 border-white/10 rounded-xl ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                    className={`h-11 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
                   />
-                  {errors.confirmPassword && <p className="text-sm text-red-400">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && <p className="text-xs text-red-400">{errors.confirmPassword}</p>}
                 </div>
               </div>
             )}
 
             {currentStep === 2 && (
-              <div className="space-y-6">
-                <div className="p-5 rounded-2xl bg-white/5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                      <Bell className="h-5 w-5 text-white" />
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="h-8 w-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                      <Bell className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold">Pushover Notifications</h3>
+                    <h3 className="font-medium text-sm">Pushover Notifications</h3>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <Input
                       placeholder="Pushover App Token (optional)"
                       value={formData.pushoverAppToken}
                       onChange={(e) => updateField('pushoverAppToken', e.target.value)}
-                      className="bg-white/5 border-white/10 rounded-xl"
+                      className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
                     />
                     <Input
                       placeholder="Pushover User Key (optional)"
                       value={formData.pushoverUserKey}
                       onChange={(e) => updateField('pushoverUserKey', e.target.value)}
-                      className="bg-white/5 border-white/10 rounded-xl"
+                      className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-white" />
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="h-8 w-8 rounded-lg bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold">Email Notifications (Resend)</h3>
+                    <h3 className="font-medium text-sm">Email Notifications (Resend)</h3>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <Input
                       placeholder="Resend API Key (optional)"
                       value={formData.resendApiKey}
                       onChange={(e) => updateField('resendApiKey', e.target.value)}
-                      className="bg-white/5 border-white/10 rounded-xl"
+                      className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
                     />
                     <Input
                       type="email"
                       placeholder="From Email (optional)"
                       value={formData.resendFromEmail}
                       onChange={(e) => updateField('resendFromEmail', e.target.value)}
-                      className="bg-white/5 border-white/10 rounded-xl"
+                      className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   These settings can be changed later in the admin settings.
                 </p>
               </div>
             )}
 
             {errors.submit && (
-              <p className="text-sm text-red-400 text-center">{errors.submit}</p>
+              <p className="text-xs text-red-400 text-center">{errors.submit}</p>
             )}
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-6 pt-2">
             <button
               onClick={handleBack}
               disabled={currentStep === 0 || isLoading}
-              className="px-6 py-3 rounded-xl bg-white/5 text-muted-foreground font-medium hover:bg-white/10 transition-all disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 rounded-xl text-muted-foreground font-medium hover:bg-white/[0.03] transition-all disabled:opacity-50 flex items-center gap-1.5 text-sm"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4" />
               Back
             </button>
 
             {currentStep < steps.length - 1 ? (
               <button
                 onClick={handleNext}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all hover:scale-105 flex items-center gap-2"
+                className="px-5 py-2 rounded-xl btn-primary text-white font-medium transition-all hover:scale-[1.02] flex items-center gap-1.5 text-sm"
               >
                 Next
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-4 w-4" />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-2 rounded-xl btn-primary text-white font-medium transition-all disabled:opacity-50 flex items-center gap-1.5 text-sm"
               >
                 {isLoading ? (
                   <>
-                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Setting up...
                   </>
                 ) : (
                   <>
                     Complete
-                    <Check className="h-5 w-5" />
+                    <Check className="h-4 w-4" />
                   </>
                 )}
               </button>

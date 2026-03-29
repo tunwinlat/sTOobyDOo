@@ -3,16 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Task } from '@/types';
-import { formatDate, cn } from '@/lib/utils';
-import {
-  CheckCircle2,
-  Circle,
-  Clock,
-  AlertCircle,
-  ChevronDown,
-  ChevronRight,
-  List,
-} from 'lucide-react';
+import { formatDate } from '@/lib/utils';
+import { Check, ChevronDown, ListTodo, Calendar, Flag } from 'lucide-react';
 
 interface TaskItemProps {
   task: Task;
@@ -22,25 +14,29 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ task, onComplete, showList = false, level = 0 }: TaskItemProps) {
-  const [isCompleted, setIsCompleted] = useState(task.isCompleted);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(task.isCompleted);
   const [isLoading, setIsLoading] = useState(false);
 
-  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-
-  const handleToggleComplete = async () => {
+  const handleToggleComplete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isLoading) return;
+    
     setIsLoading(true);
+    const newCompletedState = !isCompleted;
+    
     try {
-      const newCompleted = !isCompleted;
       const res = await fetch(`/api/tasks/${task.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isCompleted: newCompleted }),
+        body: JSON.stringify({ isCompleted: newCompletedState }),
       });
 
       if (res.ok) {
-        setIsCompleted(newCompleted);
-        onComplete?.(task.id, newCompleted);
+        setIsCompleted(newCompletedState);
+        onComplete?.(task.id, newCompletedState);
       }
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -49,146 +45,130 @@ export function TaskItem({ task, onComplete, showList = false, level = 0 }: Task
     }
   };
 
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const getPriorityClass = () => {
+    switch (task.priority) {
       case 'high':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+        return 'priority-high';
       case 'medium':
-        return <AlertCircle className="h-4 w-4 text-amber-500" />;
+        return 'priority-medium';
       case 'low':
-        return <AlertCircle className="h-4 w-4 text-emerald-500" />;
+        return 'priority-low';
       default:
-        return null;
+        return 'bg-white/[0.03] text-muted-foreground border-white/[0.06]';
     }
   };
 
-  const getPriorityClass = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'medium':
-        return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      case 'low':
-        return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-      default:
-        return 'bg-muted text-muted-foreground';
-    }
-  };
+  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
 
   return (
-    <div className={cn('space-y-2', level > 0 && 'ml-8 border-l-2 border-purple-500/20 pl-4')}>
+    <div 
+      className={`${level > 0 ? 'ml-6 border-l border-white/[0.06] pl-4' : ''}`}
+    >
       <div
-        className={cn(
-          'group flex items-start gap-3 p-5 rounded-2xl glass-card transition-all duration-200',
-          isCompleted && 'opacity-50',
-          !isCompleted && 'hover:shadow-lg hover:shadow-purple-500/10'
-        )}
+        onClick={toggleExpand}
+        className={`group glass-card rounded-xl p-4 transition-all duration-200 cursor-pointer hover:bg-white/[0.04] ${
+          isCompleted ? 'opacity-50' : ''
+        } ${isExpanded ? 'bg-white/[0.04]' : ''}`}
       >
-        {/* Expand button for subtasks */}
-        {hasSubtasks ? (
+        <div className="flex items-start gap-3">
+          {/* Checkbox */}
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-0.5 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-white/5"
+            onClick={handleToggleComplete}
+            disabled={isLoading}
+            className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-md border transition-all duration-200 flex items-center justify-center ${
+              isCompleted
+                ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400'
+                : 'border-white/[0.15] hover:border-white/[0.25]'
+            } ${isLoading ? 'opacity-50' : ''}`}
           >
-            {isExpanded ? (
-              <ChevronDown className="h-5 w-5" />
-            ) : (
-              <ChevronRight className="h-5 w-5" />
-            )}
+            {isCompleted && <Check className="h-3 w-3" />}
           </button>
-        ) : (
-          <div className="w-7" />
-        )}
 
-        {/* Complete toggle */}
-        <button
-          onClick={handleToggleComplete}
-          disabled={isLoading}
-          className={cn(
-            'mt-0.5 flex-shrink-0 transition-all duration-200 p-1 rounded-full',
-            isCompleted ? 'text-emerald-500' : 'text-muted-foreground hover:text-purple-400'
-          )}
-        >
-          {isCompleted ? (
-            <CheckCircle2 className="h-6 w-6" />
-          ) : (
-            <Circle className="h-6 w-6" />
-          )}
-        </button>
-
-        {/* Task content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-3 flex-wrap">
-            <Link
-              href={`/lists/${task.listId}?task=${task.id}`}
-              className={cn(
-                'font-semibold text-lg hover:text-purple-400 transition-colors',
-                isCompleted && 'line-through text-muted-foreground'
+          {/* Task content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start gap-2">
+              <h4 className={`font-medium text-sm leading-relaxed ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                {task.title}
+              </h4>
+              {task.priority && task.priority !== 'medium' && (
+                <span className={`flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${getPriorityClass()}`}>
+                  <Flag className="h-2.5 w-2.5" />
+                  {task.priority}
+                </span>
               )}
-            >
-              {task.title}
-            </Link>
-            <span className={cn('px-3 py-1 rounded-full text-xs font-medium border', getPriorityClass(task.priority))}>
-              {getPriorityIcon(task.priority)}
-              <span className="ml-1 capitalize">{task.priority}</span>
-            </span>
+            </div>
+
+            {/* Metadata */}
+            <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+              {showList && task.list && (
+                <Link 
+                  href={`/lists/${task.list.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                >
+                  <ListTodo className="h-3 w-3" />
+                  {task.list.name}
+                </Link>
+              )}
+              {task.dueDate && (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {formatDate(task.dueDate)}
+                </span>
+              )}
+              {hasSubtasks && (
+                <span className="inline-flex items-center gap-1">
+                  {task.subtasks?.length || 0} subtask{task.subtasks?.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
+            {/* Description preview */}
+            {task.description && (
+              <div className={`mt-2 text-xs text-muted-foreground ${!isExpanded ? 'line-clamp-1' : ''}`}>
+                {task.description}
+              </div>
+            )}
           </div>
 
-          {task.description && (
-            <p className={cn('text-sm mt-2', isCompleted ? 'text-muted-foreground/70' : 'text-muted-foreground')}>
-              {task.description}
-            </p>
+          {/* Expand button */}
+          {hasSubtasks && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleExpand();
+              }}
+              className={`flex-shrink-0 p-1.5 rounded-lg hover:bg-white/[0.06] transition-all duration-200 ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+            >
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </button>
           )}
+        </div>
 
-          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-            {showList && task.list && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5">
-                <List className="h-3 w-3" />
-                <span style={{ color: task.list.color }}>{task.list.name}</span>
-              </div>
-            )}
-            
-            {task.dueDate && (
-              <div className={cn(
-                'flex items-center gap-1.5 px-2 py-1 rounded-lg',
-                new Date(task.dueDate) < new Date() && !isCompleted ? 'bg-red-500/10 text-red-400' : 'bg-white/5'
-              )}>
-                <Clock className="h-3 w-3" />
-                <span>Due {formatDate(task.dueDate)}</span>
-              </div>
-            )}
-
-            {task.assignedTo && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-500/10">
-                <span className="text-purple-400 font-medium">@{task.assignedTo.name}</span>
-              </div>
-            )}
-
-            {hasSubtasks && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/5">
-                <span className="text-muted-foreground">
-                  {task.subtasks?.filter((st) => st.isCompleted).length || 0}/{task.subtasks?.length || 0} subtasks
+        {/* Expanded subtasks */}
+        {isExpanded && hasSubtasks && (
+          <div className="mt-3 pt-3 border-t border-white/[0.06] space-y-2">
+            {task.subtasks?.map((subtask) => (
+              <div key={subtask.id} className="flex items-start gap-2">
+                <div className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded border ${
+                  subtask.isCompleted ? 'bg-emerald-500/20 border-emerald-500/50' : 'border-white/[0.1]'
+                }`}>
+                  {subtask.isCompleted && <Check className="h-2.5 w-2.5 m-auto text-emerald-400" />}
+                </div>
+                <span className={`text-sm ${subtask.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                  {subtask.title}
                 </span>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Subtasks */}
-      {isExpanded && hasSubtasks && (
-        <div className="space-y-2">
-          {task.subtasks?.map((subtask) => (
-            <TaskItem
-              key={subtask.id}
-              task={subtask}
-              onComplete={onComplete}
-              showList={false}
-              level={level + 1}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

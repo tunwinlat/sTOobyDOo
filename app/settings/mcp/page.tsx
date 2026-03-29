@@ -4,10 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Layout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { McpToken } from '@/types';
 import {
   Loader2,
@@ -18,8 +15,9 @@ import {
   Cpu,
   Eye,
   EyeOff,
-  RefreshCw,
+  ArrowLeft,
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function McpSettingsPage() {
   const { data: session, status } = useSession();
@@ -77,7 +75,6 @@ export default function McpSettingsPage() {
         setTokens((prev) => [newToken, ...prev]);
         setNewTokenName('');
         setIsCreating(false);
-        // Auto-reveal the new token
         setRevealedTokens((prev) => new Set(prev).add(newToken.id));
       }
     } catch (error) {
@@ -135,7 +132,9 @@ export default function McpSettingsPage() {
   if (status === 'loading' || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="glass-card rounded-2xl p-8">
+          <div className="animate-spin h-6 w-6 border-2 border-slate-400 border-t-transparent rounded-full" />
+        </div>
       </div>
     );
   }
@@ -144,195 +143,208 @@ export default function McpSettingsPage() {
     <Layout>
       <div className="space-y-6 max-w-3xl">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">MCP Tokens</h1>
-          <p className="text-muted-foreground">
-            Manage API tokens for LLM integrations
-          </p>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/settings" 
+            className="inline-flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/[0.03] h-10 w-10 transition-all"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground mb-0.5">
+              MCP Tokens
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Manage API tokens for LLM integrations
+            </p>
+          </div>
         </div>
 
         {/* Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Cpu className="h-5 w-5" />
-              About MCP Integration
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Model Context Protocol (MCP) allows LLMs like Claude, GPT, and others to interact
-              with your todo lists. Each token can have different permissions and list access.
-            </p>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-sm font-medium mb-2">MCP Endpoint URL:</p>
-              <code className="text-xs bg-background px-2 py-1 rounded block">
-                {typeof window !== 'undefined' ? window.location.origin : ''}/api/mcp
-              </code>
+        <div className="glass-card rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <Cpu className="h-5 w-5 text-muted-foreground" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h2 className="font-medium">About MCP Integration</h2>
+              <p className="text-xs text-muted-foreground">Model Context Protocol</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            MCP allows LLMs like Claude, GPT, and others to interact with your todo lists. 
+            Each token can have different permissions and list access.
+          </p>
+          <div className="bg-white/[0.03] border border-white/[0.06] p-3 rounded-xl">
+            <p className="text-xs font-medium text-muted-foreground mb-1.5">MCP Endpoint URL:</p>
+            <code className="text-xs font-mono text-foreground block">
+              {typeof window !== 'undefined' ? window.location.origin : ''}/api/mcp
+            </code>
+          </div>
+        </div>
 
         {/* Create Token */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Create New Token</CardTitle>
-            <CardDescription>Generate a new MCP access token</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isCreating ? (
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Token name (e.g., 'Claude Desktop')"
-                  value={newTokenName}
-                  onChange={(e) => setNewTokenName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCreateToken()}
-                  autoFocus
-                />
-                <Button onClick={handleCreateToken}>
-                  <Check className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <Button onClick={() => setIsCreating(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Token
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+        <div className="glass-card rounded-2xl p-5">
+          <h2 className="font-medium mb-4">Create New Token</h2>
+          {isCreating ? (
+            <div className="flex gap-2">
+              <Input
+                placeholder="Token name (e.g., 'Claude Desktop')"
+                value={newTokenName}
+                onChange={(e) => setNewTokenName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreateToken()}
+                autoFocus
+                className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
+              />
+              <button 
+                onClick={handleCreateToken}
+                className="px-4 h-10 rounded-xl btn-primary text-white"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setIsCreating(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl btn-primary text-white text-sm font-medium"
+            >
+              <Plus className="h-4 w-4" />
+              Create Token
+            </button>
+          )}
+        </div>
 
         {/* Tokens List */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Your Tokens</h2>
+        <div className="space-y-3">
+          <h2 className="font-medium">Your Tokens</h2>
           
           {tokens.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Cpu className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-lg font-medium text-muted-foreground">No tokens yet</p>
-                <p className="text-sm text-muted-foreground">
-                  Create your first MCP token to enable LLM access
-                </p>
-              </CardContent>
-            </Card>
+            <div className="glass-card rounded-2xl p-12 text-center">
+              <div className="h-14 w-14 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mx-auto mb-4">
+                <Cpu className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <p className="font-medium mb-1">No tokens yet</p>
+              <p className="text-sm text-muted-foreground">
+                Create your first MCP token to enable LLM access
+              </p>
+            </div>
           ) : (
             tokens.map((token) => (
-              <Card key={token.id}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{token.name}</CardTitle>
-                      <CardDescription>
-                        Created {new Date(token.createdAt).toLocaleDateString()}
-                        {token.lastUsedAt && (
-                          <span> • Last used {new Date(token.lastUsedAt).toLocaleDateString()}</span>
-                        )}
-                      </CardDescription>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="text-destructive"
-                      onClick={() => handleDeleteToken(token.id)}
+              <div key={token.id} className="glass-card rounded-2xl p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="font-medium">{token.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Created {new Date(token.createdAt).toLocaleDateString()}
+                      {token.lastUsedAt && (
+                        <span> • Last used {new Date(token.lastUsedAt).toLocaleDateString()}</span>
+                      )}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteToken(token.id)}
+                    className="p-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-all"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Token Display */}
+                <div className="space-y-1.5 mb-4">
+                  <label className="text-xs font-medium text-muted-foreground">Token</label>
+                  <div className="flex gap-2">
+                    <code className="flex-1 bg-white/[0.03] border border-white/[0.06] px-3 py-2 rounded-xl text-xs font-mono break-all text-foreground">
+                      {revealedTokens.has(token.id) ? token.token : '•'.repeat(40)}
+                    </code>
+                    <button
+                      onClick={() => toggleReveal(token.id)}
+                      className="p-2 rounded-xl btn-ghost"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      {revealedTokens.has(token.id) ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => copyToClipboard(token.token, token.id)}
+                      className="p-2 rounded-xl btn-ghost"
+                    >
+                      {copiedId === token.id ? (
+                        <Check className="h-4 w-4 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Token Display */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Token</label>
-                    <div className="flex gap-2">
-                      <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono break-all">
-                        {revealedTokens.has(token.id) ? token.token : '•'.repeat(40)}
-                      </code>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => toggleReveal(token.id)}
-                      >
-                        {revealedTokens.has(token.id) ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => copyToClipboard(token.token, token.id)}
-                      >
-                        {copiedId === token.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                </div>
 
-                  {/* MCP URL */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">MCP URL</label>
-                    <div className="flex gap-2">
-                      <code className="flex-1 bg-muted px-3 py-2 rounded text-sm font-mono break-all">
-                        {getMcpUrl(token.token)}
-                      </code>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => copyToClipboard(getMcpUrl(token.token), `${token.id}-url`)}
+                {/* MCP URL */}
+                <div className="space-y-1.5 mb-4">
+                  <label className="text-xs font-medium text-muted-foreground">MCP URL</label>
+                  <div className="flex gap-2">
+                    <code className="flex-1 bg-white/[0.03] border border-white/[0.06] px-3 py-2 rounded-xl text-xs font-mono break-all text-foreground">
+                      {getMcpUrl(token.token)}
+                    </code>
+                    <button
+                      onClick={() => copyToClipboard(getMcpUrl(token.token), `${token.id}-url`)}
+                      className="p-2 rounded-xl btn-ghost"
+                    >
+                      {copiedId === `${token.id}-url` ? (
+                        <Check className="h-4 w-4 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Permissions */}
+                <div className="pt-4 border-t border-white/[0.06]">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Permissions</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { key: 'canCreateTasks', label: 'Create' },
+                      { key: 'canCompleteTasks', label: 'Complete' },
+                      { key: 'canEditTasks', label: 'Edit' },
+                      { key: 'canDeleteTasks', label: 'Delete' },
+                      { key: 'canCreateLists', label: 'Create Lists' },
+                    ].map((perm) => (
+                      <span 
+                        key={perm.key}
+                        className={`px-2 py-1 rounded-lg text-[10px] font-medium border ${
+                          token[perm.key as keyof McpToken] 
+                            ? 'bg-white/[0.06] text-foreground border-white/[0.1]' 
+                            : 'bg-transparent text-muted-foreground border-white/[0.04]'
+                        }`}
                       >
-                        {copiedId === `${token.id}-url` ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
+                        {perm.label}
+                      </span>
+                    ))}
                   </div>
+                </div>
 
-                  {/* Permissions */}
-                  <div className="pt-2 border-t">
-                    <p className="text-sm font-medium mb-2">Permissions</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant={token.canCreateTasks ? 'default' : 'outline'}>
-                        Create Tasks
-                      </Badge>
-                      <Badge variant={token.canCompleteTasks ? 'default' : 'outline'}>
-                        Complete Tasks
-                      </Badge>
-                      <Badge variant={token.canEditTasks ? 'default' : 'outline'}>
-                        Edit Tasks
-                      </Badge>
-                      <Badge variant={token.canDeleteTasks ? 'default' : 'outline'}>
-                        Delete Tasks
-                      </Badge>
-                      <Badge variant={token.canCreateLists ? 'default' : 'outline'}>
-                        Create Lists
-                      </Badge>
+                {/* List Access */}
+                <div className="pt-3 border-t border-white/[0.06] mt-3">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">List Access</p>
+                  {token.allowAllLists ? (
+                    <span className="px-2 py-1 rounded-lg text-[10px] font-medium bg-white/[0.06] text-foreground border border-white/[0.1]">
+                      All Lists
+                    </span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {token.listAccess?.map((la) => (
+                        <span 
+                          key={la.list.id} 
+                          className="px-2 py-1 rounded-lg text-[10px] font-medium bg-white/[0.03] text-muted-foreground border border-white/[0.06]"
+                        >
+                          {la.list.name}
+                        </span>
+                      ))}
                     </div>
-                  </div>
-
-                  {/* List Access */}
-                  <div className="pt-2 border-t">
-                    <p className="text-sm font-medium mb-2">List Access</p>
-                    {token.allowAllLists ? (
-                      <Badge variant="secondary">All Lists</Badge>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {token.listAccess?.map((la) => (
-                          <Badge key={la.list.id} variant="outline">
-                            {la.list.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                  )}
+                </div>
+              </div>
             ))
           )}
         </div>

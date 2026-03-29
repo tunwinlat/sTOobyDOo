@@ -14,19 +14,17 @@ import {
   X,
   Moon,
   Sun,
-  Check,
-  Users,
   Cpu,
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'bg-blue-500' },
-  { name: 'Lists', href: '/lists', icon: ListTodo, color: 'bg-purple-500' },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Lists', href: '/lists', icon: ListTodo },
 ];
 
 const bottomNavigation = [
-  { name: 'MCP Tokens', href: '/settings/mcp', icon: Cpu, color: 'bg-primary' },
-  { name: 'Settings', href: '/settings', icon: Settings, color: 'bg-primary' },
+  { name: 'MCP Tokens', href: '/settings/mcp', icon: Cpu },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 interface LayoutProps {
@@ -52,50 +50,60 @@ export function Layout({ children }: LayoutProps) {
       .slice(0, 2);
   };
 
+  const isActive = (href: string) => {
+    if (href === '/settings') {
+      return pathname === '/settings' || pathname === '/settings/admin';
+    }
+    if (href === '/settings/mcp') {
+      return pathname === '/settings/mcp';
+    }
+    return pathname === href || pathname?.startsWith(`${href}/`);
+  };
+
   return (
     <div className="min-h-screen gradient-bg">
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between p-4 glass-card m-4 rounded-2xl">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-semibold text-sm border border-white/10">
             S
           </div>
-          <span className="font-bold text-xl text-foreground">sTOobyDOo</span>
+          <span className="font-semibold text-lg tracking-tight">sTOobyDOo</span>
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-xl hover:bg-white/10 transition-colors"
+          className="p-2 rounded-xl hover:bg-white/5 transition-colors"
         >
-          {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-72 p-4 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 p-4 transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="h-full flex flex-col glass-card rounded-3xl p-6">
+          <div className="h-full flex flex-col glass-card rounded-2xl p-5">
             {/* Logo */}
-            <div className="hidden lg:flex items-center gap-3 mb-8">
-              <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm">
+            <div className="hidden lg:flex items-center gap-3 mb-8 px-2">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-semibold border border-white/10">
                 S
               </div>
-              <span className="font-bold text-2xl text-foreground">
+              <span className="font-semibold text-xl tracking-tight">
                 sTOobyDOo
               </span>
             </div>
 
             {/* User info */}
-            <div className="mb-6 p-4 rounded-2xl bg-secondary/50 border border-border">
+            <div className="mb-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center text-white font-medium text-sm border border-white/10">
                   {getInitials(session?.user?.name || 'U')}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{session?.user?.name}</p>
+                  <p className="font-medium text-sm truncate">{session?.user?.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {session?.user?.isAdmin ? 'Admin' : 'Member'}
                   </p>
@@ -104,24 +112,22 @@ export function Layout({ children }: LayoutProps) {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 space-y-2">
+            <nav className="flex-1 space-y-1">
               {navigation.map((item) => {
-                const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                const active = isActive(item.href);
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'nav-active text-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
                     }`}
                   >
-                    <div className={`h-8 w-8 rounded-lg ${item.color} flex items-center justify-center text-white`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
+                    <Icon className="h-4.5 w-4.5" strokeWidth={2} />
                     {item.name}
                   </Link>
                 );
@@ -129,26 +135,22 @@ export function Layout({ children }: LayoutProps) {
             </nav>
 
             {/* Bottom navigation */}
-            <div className="space-y-2 pt-4 border-t border-border/50">
+            <div className="space-y-1 pt-4 border-t border-white/[0.06]">
               {bottomNavigation.map((item) => {
-                const isActive = item.href === '/settings' 
-                  ? pathname === '/settings' || pathname === '/settings/admin'
-                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                const active = isActive(item.href);
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'nav-active text-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.03]'
                     }`}
                   >
-                    <div className={`h-8 w-8 rounded-lg ${item.color} flex items-center justify-center text-white`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
+                    <Icon className="h-4.5 w-4.5" strokeWidth={2} />
                     {item.name}
                   </Link>
                 );
@@ -156,21 +158,17 @@ export function Layout({ children }: LayoutProps) {
 
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all duration-200"
               >
-                <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center text-white">
-                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </div>
+                {theme === 'dark' ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
                 {theme === 'dark' ? 'Light mode' : 'Dark mode'}
               </button>
 
               <button
                 onClick={() => signOut({ callbackUrl: '/login' })}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-red-400 hover:bg-red-500/5 transition-all duration-200"
               >
-                <div className="h-8 w-8 rounded-lg bg-red-500 flex items-center justify-center text-white">
-                  <LogOut className="h-4 w-4" />
-                </div>
+                <LogOut className="h-4.5 w-4.5" />
                 Sign out
               </button>
             </div>
@@ -180,14 +178,14 @@ export function Layout({ children }: LayoutProps) {
         {/* Overlay for mobile */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Main content */}
         <main className="flex-1 min-w-0 p-4 lg:p-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {children}
           </div>
         </main>
