@@ -254,6 +254,87 @@ const MCP_TOOLS = [
       },
     },
   },
+  {
+    name: 'get_list',
+    description: 'Get details of a specific list',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        listId: {
+          type: 'string',
+          description: 'The ID of the list',
+        },
+      },
+      required: ['listId'],
+    },
+  },
+  {
+    name: 'update_list',
+    description: 'Update a list name, description, or color',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        listId: {
+          type: 'string',
+          description: 'The ID of the list to update',
+        },
+        name: {
+          type: 'string',
+          description: 'New name for the list',
+        },
+        description: {
+          type: 'string',
+          description: 'New description for the list',
+        },
+        color: {
+          type: 'string',
+          description: 'New color in hex format (e.g., #3b82f6)',
+        },
+      },
+      required: ['listId'],
+    },
+  },
+  {
+    name: 'delete_list',
+    description: 'Permanently delete a list and all its tasks',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        listId: {
+          type: 'string',
+          description: 'The ID of the list to delete',
+        },
+      },
+      required: ['listId'],
+    },
+  },
+  {
+    name: 'unarchive_task',
+    description: 'Restore an archived task back to active',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: {
+          type: 'string',
+          description: 'The ID of the task to unarchive',
+        },
+      },
+      required: ['taskId'],
+    },
+  },
+  {
+    name: 'get_archived_tasks',
+    description: 'Get all archived tasks across all accessible lists',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        listId: {
+          type: 'string',
+          description: 'Optional: Filter to a specific list',
+        },
+      },
+    },
+  },
 ];
 
 // Validate MCP token and get permissions
@@ -662,6 +743,143 @@ async function executeTool(
           { dueDate: 'asc' },
           { createdAt: 'desc' },
         ],
+      });
+
+      return { tasks };
+    }
+
+    case 'get_list': {
+      if (!params?.listId) throw new Error('listId is required');
+      if (allowedListIds && !allowedListIds.includes(params.listId)) {
+        throw new Error('Access denied to this list');
+      }
+
+      const list = await prisma.list.findFirst({
+        where: {
+          id: params.listId,
+          familyId: member.familyId,
+        },
+        include: {
+          _count: {
+            select: {
+              tasks: {
+                where: {
+                  isCompleted: false,
+                  isArchived: false,
+                  parentId: null,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!list) throw new Error('List not found');
+
+      return { list };
+    }
+
+    case 'update_list': {
+      if (!auth.canEditLists) throw new Error('Permission denied: cannot edit lists');
+      if (!params?.listId) throw new Error('listId is required');
+      if (allowedListIds && !allowedListIds.includes(params.listId)) {
+        throw new Error('Access denied to this list');
+      }
+
+      const existingList = await prisma.list.findFirst({
+        where: {
+          id: params.listId,
+          familyId: member.familyId,
+        },
+      });
+
+      if (!existingList) throw new Error('List not found');
+
+      const updateData: any = {};
+      if (params.name !== undefined) updateData.name = params.name;
+      if (params.description !== undefined) updateData.description = params.description;
+      if (params.color !== undefined) updateData.color = params.color;
+
+      const list = await prisma.list.update({
+        where: { id: params.listId },
+        data: updateData,
+      });
+
+      return { 
+        success: true, 
+        list,
+        message: `List "${list.name}" updated successfully`,
+      };
+    }
+
+    case 'delete_list': {
+      if (!auth.canDeleteLists) throw new Error('Permission denied: cannot delete lists');
+      if (!params?.listId) throw new Error('listId is required');
+      if (allowedListIds && !allowedListIds.includes(params.listId)) {
+        throw new Error('Access denied to this list');
+      }
+
+      const existingList = await prisma.list.findFirst({
+        where: {
+          id: params.listId,
+          familyId: member.familyId,
+        },
+      });
+
+      if (!existingList) throw new Error('List not found');
+
+      await prisma.list.delete({ where: { id: params.listId } });
+
+      return { 
+        success: true, 
+        message: `List "${existingList.name}" deleted permanently`,
+      };
+    }
+
+    case 'unarchive_task': {
+      if (!auth.canEditTasks) throw new Error('Permission denied: cannot edit tasks');
+      if (!params?.taskId) throw new Error('taskId is required');
+
+      const existingTask = await prisma.task.findFirst({
+        where: {
+          id: params.taskId,
+          list: { familyId: member.familyId },
+        },
+      });
+
+      if (!existingTask) throw new Error('Task not found');
+      if (allowedListIds && !allowedListIds.includes(existingTask.listId)) {
+        throw new Error('Access denied to this task');
+      }
+
+      const task = await prisma.task.update({
+        where: { id: params.taskId },
+        data: { isArchived: false },
+      });
+
+      return { 
+        success: true, 
+        task,
+        message: `Task "${task.title}" restored from archive`,
+      };
+    }
+
+    case 'get_archived_tasks': {
+      const tasks = await prisma.task.findMany({
+        where: {
+          list: { 
+            familyId: member.familyId,
+            ...(allowedListIds ? { id: { in: allowedListIds } } : {}),
+            ...(params?.listId ? { id: params.listId } : {}),
+          },
+          isArchived: true,
+          parentId: null,
+        },
+        include: {
+          list: { select: { id: true, name: true, color: true } },
+          assignedTo: { select: { id: true, name: true } },
+        },
+        orderBy: { updatedAt: 'desc' },
       });
 
       return { tasks };
