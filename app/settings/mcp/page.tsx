@@ -19,6 +19,31 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+// Permission Toggle Component
+function PermissionToggle({ 
+  label, 
+  checked, 
+  onChange 
+}: { 
+  label: string; 
+  checked: boolean; 
+  onChange: () => void;
+}) {
+  return (
+    <button
+      onClick={onChange}
+      className={`flex items-center gap-2 p-2 rounded-lg border text-xs font-medium transition-all ${
+        checked 
+          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+          : 'bg-white/[0.03] border-white/[0.06] text-muted-foreground'
+      }`}
+    >
+      <div className={`w-3.5 h-3.5 rounded-full ${checked ? 'bg-emerald-500' : 'bg-white/10'}`} />
+      {label}
+    </button>
+  );
+}
+
 export default function McpSettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -26,6 +51,16 @@ export default function McpSettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [newTokenName, setNewTokenName] = useState('');
+  const [newTokenPermissions, setNewTokenPermissions] = useState({
+    allowAllLists: true,
+    canCreateTasks: true,
+    canCompleteTasks: true,
+    canEditTasks: true,
+    canDeleteTasks: false,
+    canCreateLists: false,
+    canEditLists: false,
+    canDeleteLists: false,
+  });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revealedTokens, setRevealedTokens] = useState<Set<string>>(new Set());
 
@@ -63,10 +98,7 @@ export default function McpSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newTokenName,
-          allowAllLists: true,
-          canCreateTasks: true,
-          canCompleteTasks: true,
-          canEditTasks: true,
+          ...newTokenPermissions,
         }),
       });
 
@@ -74,12 +106,26 @@ export default function McpSettingsPage() {
         const newToken = await res.json();
         setTokens((prev) => [newToken, ...prev]);
         setNewTokenName('');
+        setNewTokenPermissions({
+          allowAllLists: true,
+          canCreateTasks: true,
+          canCompleteTasks: true,
+          canEditTasks: true,
+          canDeleteTasks: false,
+          canCreateLists: false,
+          canEditLists: false,
+          canDeleteLists: false,
+        });
         setIsCreating(false);
         setRevealedTokens((prev) => new Set(prev).add(newToken.id));
       }
     } catch (error) {
       console.error('Failed to create token:', error);
     }
+  };
+
+  const togglePermission = (key: keyof typeof newTokenPermissions) => {
+    setNewTokenPermissions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleDeleteToken = async (tokenId: string) => {
@@ -187,7 +233,7 @@ export default function McpSettingsPage() {
         <div className="glass-card rounded-2xl p-5">
           <h2 className="font-medium mb-4">Create New Token</h2>
           {isCreating ? (
-            <div className="flex gap-2">
+            <div className="space-y-4">
               <Input
                 placeholder="Token name (e.g., 'Claude Desktop')"
                 value={newTokenName}
@@ -196,12 +242,73 @@ export default function McpSettingsPage() {
                 autoFocus
                 className="h-10 bg-white/[0.03] border-white/[0.08] rounded-xl text-sm"
               />
-              <button 
-                onClick={handleCreateToken}
-                className="px-4 h-10 rounded-xl btn-primary text-white"
-              >
-                <Check className="h-4 w-4" />
-              </button>
+              
+              {/* Permissions */}
+              <div className="space-y-3 pt-3 border-t border-white/[0.06]">
+                <p className="text-xs font-medium text-muted-foreground">Permissions</p>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <PermissionToggle
+                    label="Create Tasks"
+                    checked={newTokenPermissions.canCreateTasks}
+                    onChange={() => togglePermission('canCreateTasks')}
+                  />
+                  <PermissionToggle
+                    label="Complete Tasks"
+                    checked={newTokenPermissions.canCompleteTasks}
+                    onChange={() => togglePermission('canCompleteTasks')}
+                  />
+                  <PermissionToggle
+                    label="Edit Tasks"
+                    checked={newTokenPermissions.canEditTasks}
+                    onChange={() => togglePermission('canEditTasks')}
+                  />
+                  <PermissionToggle
+                    label="Delete Tasks"
+                    checked={newTokenPermissions.canDeleteTasks}
+                    onChange={() => togglePermission('canDeleteTasks')}
+                  />
+                  <PermissionToggle
+                    label="Create Lists"
+                    checked={newTokenPermissions.canCreateLists}
+                    onChange={() => togglePermission('canCreateLists')}
+                  />
+                  <PermissionToggle
+                    label="Edit Lists"
+                    checked={newTokenPermissions.canEditLists}
+                    onChange={() => togglePermission('canEditLists')}
+                  />
+                  <PermissionToggle
+                    label="Delete Lists"
+                    checked={newTokenPermissions.canDeleteLists}
+                    onChange={() => togglePermission('canDeleteLists')}
+                  />
+                  <PermissionToggle
+                    label="All Lists Access"
+                    checked={newTokenPermissions.allowAllLists}
+                    onChange={() => togglePermission('allowAllLists')}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button 
+                  onClick={() => {
+                    setIsCreating(false);
+                    setNewTokenName('');
+                  }}
+                  className="flex-1 px-4 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.03] transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleCreateToken}
+                  disabled={!newTokenName.trim()}
+                  className="flex-1 px-4 py-2 rounded-xl btn-primary text-white text-sm font-medium disabled:opacity-50"
+                >
+                  Create Token
+                </button>
+              </div>
             </div>
           ) : (
             <button 
