@@ -9,6 +9,7 @@ on:
 jobs:
   check-reminders:
     runs-on: ubuntu-latest
+    environment: Production  # <-- Add this line
     steps:
       - name: Trigger Reminders API
         run: |
