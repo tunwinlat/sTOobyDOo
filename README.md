@@ -324,10 +324,17 @@ To send reminder notifications at the scheduled time, you need to periodically c
 The repo includes a GitHub Actions workflow (`.github/workflows/reminders.yml`) that runs every 5 minutes and calls your reminders endpoint.
 
 **Setup:**
-1. Go to your GitHub repository → Settings → Secrets and variables → Actions
-2. Add these repository secrets:
-   - `VERCEL_URL`: Your deployed app URL with `https://` (e.g., `https://your-app.vercel.app`)
-   - `CRON_SECRET`: A random secret string (same as your `CRON_SECRET` env var)
+
+1. **Vercel Environment Variable:**
+   - Go to Vercel → Your project → Settings → Environment Variables
+   - Add: `CRON_SECRET` = any random string (e.g., `openssl rand -base64 32`)
+   - **Redeploy** your app after adding
+
+2. **GitHub Repository Secrets:**
+   - Go to GitHub → Settings → Secrets and variables → Actions
+   - Add these secrets:
+     - `VERCEL_URL`: Your deployed app URL with `https://` (e.g., `https://your-app.vercel.app`)
+     - `CRON_SECRET`: **Same** random string as above
 
 **Note:** GitHub Actions free tier has a 2,000 minutes/month limit. Running every 5 minutes uses ~2,160 minutes/month, so you may want to adjust the frequency:
 
