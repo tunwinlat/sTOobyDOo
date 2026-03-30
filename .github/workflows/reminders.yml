@@ -12,7 +12,15 @@ jobs:
     steps:
       - name: Trigger Reminders API
         run: |
-          curl -X GET "${{ secrets.VERCEL_URL }}/api/cron/reminders" \
+          # Ensure URL has https:// prefix
+          URL="${{ secrets.VERCEL_URL }}"
+          if [[ ! "$URL" =~ ^https?:// ]]; then
+            URL="https://$URL"
+          fi
+          
+          echo "Calling: $URL/api/cron/reminders"
+          
+          curl -X GET "$URL/api/cron/reminders" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
-            -f || echo "Request failed"
+            -f -v || echo "Request failed - check your VERCEL_URL and CRON_SECRET secrets"
